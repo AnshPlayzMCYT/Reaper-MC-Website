@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaper MC | Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        'brand-darkest': '#050f18',
+                        'brand-dark': '#0d1f2e',
+                        'brand-light': '#142a3d',
+                        'brand-border': '#1d3449',
+                        'brand-text': '#99aec2',
+                        'brand-blue': '#008bff',
+                        secondary: '#8b5cf6',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-brand-darkest text-brand-text min-h-screen p-4 sm:p-8">
+
+    <!-- Global Page Loader -->
+    <div id="page-loader"
+        class="fixed inset-0 z-[9999] bg-brand-dark flex flex-col items-center justify-center transition-opacity duration-500">
+        <i class="ri-loader-4-line text-5xl text-brand-blue animate-spin mb-4 drop-shadow-2xl"></i>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals"></div>
+
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <header
+            class="flex items-center justify-between mb-8 bg-brand-dark border border-brand-border p-6 rounded-xl shadow-lg">
+            <div class="flex items-center gap-4">
+                <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                    alt="Logo" class="w-12 h-12">
+                <div>
+                    <h1 class="text-2xl font-black text-white">Admin Dashboard</h1>
+                    <p class="text-sm">Manage users and store content</p>
+                </div>
+            </div>
+            <a href="index.html"
+                class="flex items-center gap-2 bg-brand-light hover:bg-brand-border text-white px-4 py-2 rounded-lg transition-colors font-semibold shadow-sm border border-brand-border">
+                <i class="ri-home-4-line"></i> Back to Store
+            </a>
+        </header>
+
+        <!-- Stats row (Placeholder for future) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div class="bg-brand-light border border-brand-border rounded-xl p-6 shadow-md">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-semibold mb-1 text-brand-text">Total Users</p>
+                        <p class="text-3xl font-black text-white" id="stat-total-users">-</p>
+                    </div>
+                    <div class="bg-brand-darkest p-3 rounded-lg text-brand-blue">
+                        <i class="ri-group-line text-2xl"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Notification Banner -->
+        <div id="admin-notification" class="hidden rounded-lg p-4 mb-6 text-sm font-semibold transition-all"></div>
+
+        <!-- Users Table -->
+        <div class="bg-brand-dark border border-brand-border rounded-xl shadow-lg overflow-hidden">
+            <div class="p-6 border-b border-brand-border flex justify-between items-center bg-brand-light/50">
+                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                    <i class="ri-user-settings-line text-brand-blue"></i>
+                    User Management
+                </h2>
+                <button id="refresh-users-btn"
+                    class="text-brand-text hover:text-white transition-colors bg-brand-darkest p-2 rounded-lg border border-brand-border hover:border-brand-blue/50 group">
+                    <i
+                        class="ri-refresh-line group-hover:rotate-180 transition-transform duration-500 inline-block"></i>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr
+                            class="bg-brand-darkest border-b border-brand-border text-xs uppercase tracking-wider text-brand-text">
+                            <th class="p-4 font-semibold">Player</th>
+                            <th class="p-4 font-semibold">Email</th>
+                            <th class="p-4 font-semibold">Status</th>
+                            <th class="p-4 font-semibold">Joined At</th>
+                            <th class="p-4 font-semibold text-right">Actions</th>
+                            <th class="p-4 font-semibold text-center">Logins</th>
+                        </tr>
+                    </thead>
+                    <tbody id="users-table-body" class="divide-y divide-brand-border">
+                        <!-- Users will be injected here via JS -->
+                        <tr>
+                            <td colspan="5" class="p-8 text-center text-brand-text">
+                                <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
+                                <p>Loading users...</p>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script type="module" src="js/admin.js"></script>
+    <script>
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500);
+            }
+        });
+    </script>
+</body>
+
+</html>

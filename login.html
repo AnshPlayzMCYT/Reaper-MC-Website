@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaper MC | Login</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        'brand-darkest': '#050f18',
+                        'brand-dark': '#0d1f2e',
+                        'brand-light': '#142a3d',
+                        'brand-border': '#1d3449',
+                        'brand-text': '#99aec2',
+                        'brand-blue': '#008bff',
+                        secondary: '#8b5cf6',
+                    },
+                    keyframes: {
+                        loading: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(200%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-brand-dark text-brand-text min-h-screen flex items-center justify-center p-4">
+
+    <!-- Global Page Loader -->
+    <div id="page-loader"
+        class="fixed inset-0 z-[9999] bg-brand-dark flex flex-col items-center justify-center transition-opacity duration-500">
+        <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+            alt="Loading..." class="w-24 h-24 drop-shadow-2xl mb-4 animate-pulse">
+        <div class="w-48 h-1.5 bg-brand-darkest rounded-full overflow-hidden relative">
+            <div
+                class="absolute top-0 left-0 h-full w-1/2 bg-brand-blue rounded-full animate-[loading_1.5s_ease-in-out_infinite]">
+            </div>
+        </div>
+    </div>
+    <div class="bg-brand-light border border-brand-border rounded-xl shadow-2xl p-8 max-w-md w-full relative">
+        <a href="index.html" class="absolute top-4 left-4 text-brand-text hover:text-white transition-colors">
+            <i class="ri-arrow-left-line text-xl"></i>
+        </a>
+
+        <div class="text-center mb-8">
+            <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                alt="Reaper MC Logo" class="w-24 mx-auto mb-4 drop-shadow-lg">
+            <h2 class="text-3xl font-black text-white">Welcome Back</h2>
+            <p class="text-sm mt-2">Login to manage your store purchases.</p>
+        </div>
+
+        <!-- Error Message Container -->
+        <div id="auth-error"
+            class="hidden bg-red-500/10 border border-red-500/50 text-red-500 text-sm p-3 rounded-md mb-4 text-center">
+        </div>
+
+        <form id="login-form" class="space-y-4">
+            <div>
+                <label class="block text-sm font-semibold mb-1 text-white">Email Address</label>
+                <input type="email" id="email" required
+                    class="w-full bg-brand-darkest border border-brand-border rounded-lg py-3 px-4 text-white focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-colors"
+                    placeholder="player@example.com">
+            </div>
+
+            <div>
+                <div class="flex justify-between items-center mb-1">
+                    <label class="block text-sm font-semibold text-white">Password</label>
+                    <a href="forgot-password.html" class="text-xs text-brand-blue hover:underline">Forgot Password?</a>
+                </div>
+                <input type="password" id="password" required
+                    class="w-full bg-brand-darkest border border-brand-border rounded-lg py-3 px-4 text-white focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-colors"
+                    placeholder="••••••••">
+            </div>
+
+            <button type="submit" id="login-btn"
+                class="w-full bg-brand-blue hover:opacity-90 text-white font-bold py-3 rounded-lg transition-transform active:scale-95 flex items-center justify-center">
+                <span id="login-text">Login</span>
+                <i id="login-spinner" class="ri-loader-4-line animate-spin hidden ml-2"></i>
+            </button>
+        </form>
+
+        <div class="mt-6 flex items-center">
+            <div class="flex-grow border-t border-brand-border"></div>
+            <span class="px-3 text-sm text-brand-text">or</span>
+            <div class="flex-grow border-t border-brand-border"></div>
+        </div>
+
+        <button id="google-login-btn"
+            class="mt-6 w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-3 px-4 rounded-lg flex justify-center items-center gap-2 transition-transform active:scale-95">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
+            Sign in with Google
+        </button>
+
+        <p class="text-center mt-6 text-sm">
+            Don't have an account? <a href="signup.html" class="text-brand-blue font-semibold hover:underline">Sign
+                up</a>
+        </p>
+    </div>
+
+    <!-- Firebase Auth Script -->
+    <script type="module" src="js/auth.js"></script>
+    <script>
+        // --- Page Loader Script ---
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500); // Wait for fade out transition (duration-500)
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,782 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaper MC | Welcome</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-darkest': '#050f18',
+                        'brand-dark': '#0d1f2e',
+                        'brand-light': '#142a3d',
+                        'brand-border': '#1d3449',
+                        'brand-text': '#99aec2',
+                        'brand-blue': '#008bff',
+                        'brand-green': '#75e12f',
+                        'brand-green-hover': '#9bff5b',
+                        'brand-discord': '#5865F2',
+                        primary: '#00bcd4', // Your original primary color
+                        secondary: '#8b5cf6', // Your original secondary color (light purple)
+                    },
+                    keyframes: {
+                        loading: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(200%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0d1f2e;
+            /* brand-dark */
+            color: #99aec2;
+            /* brand-text */
+        }
+
+        .hero-section {
+            /* Use the new background image */
+            background: linear-gradient(0deg, #0d1f2e 0%, rgba(13, 31, 46, 0.7) 100%), url('https://readdy.ai/api/search-image?query=mystical%20dark%20fantasy%20landscape%20with%20swirling%20purple%20and%20cyan%20energy%20portals%2C%20ethereal%20mists%2C%20floating%20crystal%20formations%2C%20dramatic%20lighting%2C%20cinematic%20atmosphere%2C%20dark%20magical%20realm%20with%20glowing%20elements%2C%20mysterious%20ancient%20structures%20in%20background&width=1920&height=1080&seq=hero001&orientation=landscape');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .logo-main {
+            transition: transform 0.3s ease;
+        }
+
+        .logo-main:hover {
+            transform: scale(1.05);
+        }
+
+        .copy-feedback {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            transform: translateX(120%);
+            background: #10b981;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            z-index: 5000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .copy-feedback.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* Styles from your original design for the rank cards */
+        .legend-glow {
+            animation: legendPulse 2s ease-in-out infinite alternate;
+        }
+
+        .immortal-glow {
+            animation: immortalPulse 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes legendPulse {
+            0% {
+                box-shadow: 0 0 15px rgba(249, 115, 22, 0.3), inset 0 0 5px rgba(249, 115, 22, 0.2);
+            }
+
+            100% {
+                box-shadow: 0 0 25px rgba(249, 115, 22, 0.6), inset 0 0 10px rgba(249, 115, 22, 0.3);
+            }
+        }
+
+        @keyframes immortalPulse {
+            0% {
+                box-shadow: 0 0 15px rgba(0, 188, 212, 0.3), inset 0 0 5px rgba(0, 188, 212, 0.2);
+            }
+
+            100% {
+                box-shadow: 0 0 25px rgba(0, 188, 212, 0.6), inset 0 0 10px rgba(0, 188, 212, 0.3);
+            }
+        }
+
+        .hover-scale {
+            transition: transform 0.3s ease;
+        }
+
+        .hover-scale:hover {
+            transform: scale(1.05);
+        }
+
+        .rank-card-gradient {
+            transition: all 0.3s ease;
+            background-color: #1f2937;
+            /* Slightly lighter than brand-light for contrast */
+        }
+
+        .rank-card-gradient:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Added: button hover/active styles */
+        .header-btn {
+            transition: transform 0.15s ease-out, background-color 0.15s ease-out;
+        }
+
+        .header-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .header-btn:active {
+            /* Added black background on click for discord */
+            transform: scale(0.95);
+        }
+
+        /* Specific active style for discord */
+        a.header-btn.bg-brand-discord:active {
+            background-color: #1e293b;
+            /* Dark slate */
+        }
+
+        /* Purchase button */
+        .purchase-btn {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .purchase-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+        }
+
+        .purchase-btn:active {
+            transform: translateY(0px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+
+<body class="bg-brand-dark">
+
+    <!-- Global Page Loader -->
+    <div id="page-loader"
+        class="fixed inset-0 z-[9999] bg-brand-dark flex flex-col items-center justify-center transition-opacity duration-500">
+        <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+            alt="Loading..." class="w-24 h-24 drop-shadow-2xl mb-4 animate-pulse">
+        <div class="w-48 h-1.5 bg-brand-darkest rounded-full overflow-hidden relative">
+            <div
+                class="absolute top-0 left-0 h-full w-1/2 bg-brand-blue rounded-full animate-[loading_1.5s_ease-in-out_infinite]">
+            </div>
+        </div>
+    </div>
+    <!-- NEW Header Section -->
+    <header class="hero-section">
+        <nav class="p-4">
+            <div class="max-w-7xl mx-auto flex justify-between items-center">
+                <!-- Left Links -->
+                <div class="flex items-center gap-2">
+                    <a href="#"
+                        class="header-btn bg-brand-blue hover:opacity-90 text-white font-bold py-2 px-4 rounded-md text-sm sm:text-base">Home</a>
+                    <a href="#ranks"
+                        class="header-btn bg-secondary hover:bg-secondary/80 text-white font-bold py-2 px-4 rounded-md text-sm sm:text-base">Store</a>
+                </div>
+                <!-- Right Links -->
+                <div class="flex items-center gap-2">
+                    <button id="ip-copy-btn"
+                        class="header-btn bg-black bg-opacity-30 hover:bg-opacity-50 text-white font-semibold py-2 px-4 rounded-md flex items-center gap-2 text-sm sm:text-base">
+                        <i class="ri-server-line"></i>
+                        <span class="hidden md:inline">play.reapermc.in</span>
+                    </button>
+                    <a href="https://discord.gg/gge9nmnJ5h" target="_blank"
+                        class="header-btn bg-brand-discord hover:opacity-90 text-white font-bold p-2 rounded-md">
+                        <i class="ri-discord-fill text-xl"></i>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <div class="text-center py-12 sm:py-20 md:py-24">
+            <a href="#" class="inline-block px-4">
+                <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                    alt="Reaper MC Logo" class="logo-main w-40 sm:w-56 md:w-64 mx-auto drop-shadow-xl">
+            </a>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="-mt-16 sm:-mt-20 z-10 relative">
+        <div class="max-w-6xl mx-auto px-4">
+
+            <!-- NEW Store & Login Bar -->
+            <div id="store"
+                class="bg-brand-light border border-brand-border rounded-lg p-4 flex flex-col md:flex-row items-center justify-between shadow-lg gap-4">
+                <div class="flex items-center space-x-3">
+                    <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                        alt="Small Logo" class="w-12 h-12 rounded">
+                    <div>
+                        <h3 class="font-black text-white text-lg">Reaper MC</h3>
+                        <p class="text-brand-text text-sm font-semibold">The Only Official Reaper MC Store!</p>
+                    </div>
+                </div>
+                <div id="login-display-area" class="flex items-center justify-center space-x-4 w-full md:w-auto">
+                    <!-- Login/Logout UI will be injected here by JavaScript -->
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- YOUR ORIGINAL RANKS/STORE SECTION -->
+    <section id="ranks" class="py-20 bg-brand-dark">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4 text-white">Choose Your Rank</h2>
+                <p class="text-xl text-brand-text max-w-3xl mx-auto">Select the perfect rank that suits your playstyle
+                    and unlock exclusive features, commands, and perks.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+
+                <!-- VIP Card -->
+                <div
+                    class="bg-brand-light border-2 border-primary/30 rounded-xl p-6 hover:border-primary/60 rank-card-gradient">
+                    <div class="text-center mb-6">
+                        <div class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-primary/20 rounded-lg"><i
+                                class="ri-vip-crown-line text-primary text-2xl"></i></div>
+                        <h3 class="text-2xl font-bold text-primary mb-2">VIP</h3>
+                        <div class="text-3xl font-bold text-white">₹149</div>
+                    </div>
+                    <ul class="space-y-3 mb-6 text-brand-text">
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>Chat colors
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>Spectator mode
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>Custom chat messages
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>VIP prefix
+                        </li>
+                    </ul><button
+                        class="w-full bg-primary hover:bg-primary/90 text-slate-900 py-3 rounded-md font-semibold whitespace-nowrap purchase-btn"
+                        data-checkout-link="upi://pay?pa=ladhevansh@fam&am=149&cu=INR">Purchase VIP</button>
+                </div>
+
+                <!-- VIP+ Card -->
+                <div
+                    class="bg-brand-light border-2 border-secondary/30 rounded-xl p-6 hover:border-secondary/60 rank-card-gradient">
+                    <div class="text-center mb-6">
+                        <div class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-secondary/20 rounded-lg">
+                            <i class="ri-vip-crown-2-line text-secondary text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-secondary mb-2">VIP+</h3>
+                        <div class="text-3xl font-bold text-white">₹299</div>
+                    </div>
+                    <ul class="space-y-3 mb-6 text-brand-text">
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-secondary"></i></div>All VIP perks
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-secondary"></i></div>Fly mode
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-secondary"></i></div>Priority support
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-secondary"></i></div>Access to VIP+ areas
+                        </li>
+                    </ul><button
+                        class="w-full bg-secondary hover:bg-secondary/90 text-white py-3 rounded-md font-semibold whitespace-nowrap purchase-btn"
+                        data-checkout-link="upi://pay?pa=ladhevansh@fam&am=299&cu=INR">Purchase VIP+</button>
+                </div>
+
+                <!-- MVP Card -->
+                <div
+                    class="bg-brand-light border-2 border-pink-500/30 rounded-xl p-6 hover:border-pink-500/60 rank-card-gradient">
+                    <div class="text-center mb-6">
+                        <div class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-pink-500/20 rounded-lg">
+                            <i class="ri-medal-line text-pink-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-pink-500 mb-2">MVP</h3>
+                        <div class="text-3xl font-bold text-white">₹449</div>
+                    </div>
+                    <ul class="space-y-3 mb-6 text-brand-text">
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-pink-500"></i></div>All VIP+ perks
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-pink-500"></i></div>Priority matchmaking
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-pink-500"></i></div>Advanced spectral features
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-pink-500"></i></div>Exclusive MVP kit
+                        </li>
+                    </ul><button
+                        class="w-full bg-pink-500 hover:bg-pink-500/90 text-white py-3 rounded-md font-semibold whitespace-nowrap purchase-btn"
+                        data-checkout-link="upi://pay?pa=ladhevansh@fam&am=499&cu=INR">Purchase MVP</button>
+                </div>
+
+                <!-- MVP+ Card -->
+                <div
+                    class="bg-brand-light border-2 border-blue-500/30 rounded-xl p-6 hover:border-blue-500/60 rank-card-gradient">
+                    <div class="text-center mb-6">
+                        <div class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-blue-500/20 rounded-lg">
+                            <i class="ri-trophy-line text-blue-500 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-blue-500 mb-2">MVP+</h3>
+                        <div class="text-3xl font-bold text-white">₹599</div>
+                    </div>
+                    <ul class="space-y-3 mb-6 text-brand-text">
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-blue-500"></i></div>All MVP perks
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-blue-500"></i></div>Nick protection
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-blue-500"></i></div>Custom death messages
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-blue-500"></i></div>Exclusive cosmetics
+                        </li>
+                    </ul><button
+                        class="w-full bg-blue-500 hover:bg-blue-500/90 text-white py-3 rounded-md font-semibold whitespace-nowrap purchase-btn"
+                        data-checkout-link="upi://pay?pa=ladhevansh@fam&am=599&cu=INR">Purchase MVP+</button>
+                </div>
+
+                <!-- Legend Card (Unique Style) -->
+                <div
+                    class="bg-gradient-to-br from-orange-900/30 via-brand-light to-brand-light border-2 border-orange-500/50 rounded-xl p-6 hover:border-orange-400 legend-glow rank-card-gradient relative overflow-hidden">
+                    <div class="absolute top-0 right-0 h-16 w-16">
+                        <div
+                            class="absolute transform rotate-45 bg-orange-500 text-center text-white font-semibold py-1 right-[-34px] top-[32px] w-[170px]">
+                            Premium</div>
+                    </div>
+                    <div class="text-center mb-6">
+                        <div
+                            class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-orange-500/20 rounded-lg">
+                            <i class="ri-fire-line text-orange-400 text-2xl"></i>
+                        </div>
+                        <h3 class="text-2xl font-bold text-orange-400 mb-2">Legend</h3>
+                        <div class="text-3xl font-bold text-white">₹799</div>
+                    </div>
+                    <ul class="space-y-3 mb-6 text-brand-text">
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-orange-500"></i></div>All MVP+ perks
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-orange-500"></i></div>Legendary effects
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-orange-500"></i></div>Unlimited map selection
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-orange-500"></i></div>Early access to new gamemodes
+                        </li>
+                    </ul><button
+                        class="w-full bg-orange-500 hover:bg-orange-500/90 text-white py-3 rounded-md font-semibold whitespace-nowrap purchase-btn"
+                        data-checkout-link="upi://pay?pa=ladhevansh@fam&am=799&cu=INR">Purchase Legend</button>
+                </div>
+
+                <!-- Immortal Card (Unique Style) -->
+                <div
+                    class="bg-gradient-to-br from-cyan-900/30 via-brand-light to-brand-light border-2 border-cyan-400/50 rounded-xl p-6 hover:border-cyan-300 immortal-glow rank-card-gradient relative overflow-hidden">
+                    <div class="absolute top-0 right-0 h-16 w-16">
+                        <div
+                            class="absolute transform rotate-45 bg-cyan-500 text-center text-white font-semibold py-1 right-[-34px] top-[32px] w-[170px]">
+                            Ultimate</div>
+                    </div>
+                    <div class="text-center mb-6">
+                        <div class="w-12 h-12 flex items-center justify-center mx-auto mb-4 bg-primary/20 rounded-lg"><i
+                                class="ri-infinity-line text-cyan-400 text-2xl"></i></div>
+                        <h3 class="text-2xl font-bold text-cyan-400 mb-2">Immortal</h3>
+                        <div class="text-3xl font-bold text-white">₹999</div>
+                    </div>
+                    <ul class="space-y-3 mb-6 text-brand-text">
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>All Legend perks
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>Ultimate packages
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>Immortal private matches
+                        </li>
+                        <li class="flex items-center">
+                            <div class="w-4 h-4 flex items-center justify-center mr-3"><i
+                                    class="ri-check-line text-primary"></i></div>Early access to new gamemodes
+                        </li>
+                    </ul><button
+                        class="w-full bg-primary hover:bg-primary/90 text-slate-900 py-3 rounded-md font-semibold whitespace-nowrap purchase-btn"
+                        data-checkout-link="upi://pay?pa=ladhevansh@fam&am=999&cu=INR">Purchase Immortal</button>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- YOUR ORIGINAL OTHER SECTIONS -->
+    <section class="py-20 bg-brand-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold mb-4 text-white">Rank Comparison</h2>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full bg-brand-dark rounded-xl overflow-hidden">
+                    <thead>
+                        <tr class="bg-brand-border">
+                            <th class="text-left p-4 text-brand-text">Features</th>
+                            <th class="text-center p-4 text-primary">VIP</th>
+                            <th class="text-center p-4 text-secondary">VIP+</th>
+                            <th class="text-center p-4 text-pink-500">MVP</th>
+                            <th class="text-center p-4 text-blue-500">MVP+</th>
+                            <th class="text-center p-4 text-orange-500">Legend</th>
+                            <th class="text-center p-4 text-primary">Immortal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="border-b border-brand-border">
+                            <td class="p-4 text-brand-text">Select Maps</td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-brand-border">
+                            <td class="p-4 text-brand-text">Spectate Match</td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-close-line text-red-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                        </tr>
+                        <tr class="border-b border-brand-border">
+                            <td class="p-4 text-brand-text">Host Private Games</td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-close-line text-red-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-close-line text-red-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="p-4 text-brand-text">Early Access</td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-close-line text-red-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-close-line text-red-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-close-line text-red-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-close-line text-red-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                            <td class="text-center p-4">
+                                <div class="w-5 h-5 flex items-center justify-center mx-auto"><i
+                                        class="ri-check-line text-green-500"></i></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+    <section id="skin-viewer" class="py-20 bg-brand-dark">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h2 class="text-4xl font-bold mb-4 text-white">Minecraft Skin Viewer</h2>
+            <p class="text-xl text-brand-text max-w-3xl mx-auto mb-8">Enter your Java Edition username below to display
+                a full-body render of your skin.</p>
+            <div class="flex justify-center items-center gap-2 max-w-md mx-auto mb-8"><input type="text"
+                    id="skin-username-input" placeholder="Enter Username"
+                    class="w-full bg-brand-light border border-brand-border rounded-lg py-3 text-base px-4 text-white focus:outline-none focus:ring-2 focus:ring-brand-blue"><button
+                    id="view-skin-btn"
+                    class="bg-secondary hover:bg-secondary/90 text-white px-6 py-3 rounded-md font-semibold whitespace-nowrap transition-all duration-300">View
+                    Skin</button></div>
+            <div id="skin-render-container"
+                class="h-96 flex items-center justify-center bg-brand-light/50 rounded-lg p-4"><img id="skin-image"
+                    src="https://visage.surgeplay.com/full/512/steve" alt="Minecraft Skin Render"
+                    class="max-h-full transition-opacity duration-500 opacity-100" style="image-rendering: pixelated;">
+            </div>
+        </div>
+    </section>
+    <section id="vote" class="py-20 bg-brand-light">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-bold mb-4 text-white">Vote For Reaper MC</h2>
+                <p class="text-xl text-brand-text max-w-3xl mx-auto">Vote daily to earn in-game rewards and help our
+                    community grow!</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><a href="#" target="_blank"
+                    class="bg-brand-dark p-6 rounded-xl border-2 border-transparent hover:border-primary transition-all duration-300 hover-scale text-center">
+                    <h3 class="text-xl font-bold text-white">Vote Site 1</h3>
+                    <p class="text-brand-text mt-1">e.g., PlanetMinecraft</p>
+                </a><a href="#" target="_blank"
+                    class="bg-brand-dark p-6 rounded-xl border-2 border-transparent hover:border-primary transition-all duration-300 hover-scale text-center">
+                    <h3 class="text-xl font-bold text-white">Vote Site 2</h3>
+                    <p class="text-brand-text mt-1">e.g., Minecraft-Server-List</p>
+                </a><a href="#" target="_blank"
+                    class="bg-brand-dark p-6 rounded-xl border-2 border-transparent hover:border-primary transition-all duration-300 hover-scale text-center">
+                    <h3 class="text-xl font-bold text-white">Vote Site 3</h3>
+                    <p class="text-brand-text mt-1">e.g., TopG</p>
+                </a><a href="#" target="_blank"
+                    class="bg-brand-dark p-6 rounded-xl border-2 border-transparent hover:border-primary transition-all duration-300 hover-scale text-center">
+                    <h3 class="text-xl font-bold text-white">Vote Site 4</h3>
+                    <p class="text-brand-text mt-1">e.g., Minecraft-MP</p>
+                </a><a href="#" target="_blank"
+                    class="bg-brand-dark p-6 rounded-xl border-2 border-transparent hover:border-primary transition-all duration-300 hover-scale text-center">
+                    <h3 class="text-xl font-bold text-white">Vote Site 5</h3>
+                    <p class="text-brand-text mt-1">e.g., TopMinecraftServers</p>
+                </a><a href="#" target="_blank"
+                    class="bg-brand-dark p-6 rounded-xl border-2 border-transparent hover:border-primary transition-all duration-300 hover-scale text-center">
+                    <h3 class="text-xl font-bold text-white">Vote Site 6</h3>
+                    <p class="text-brand-text mt-1">e.g., MinecraftServers.org</p>
+                </a></div>
+        </div>
+    </section>
+
+    <!-- YOUR ORIGINAL FOOTER (Slightly adjusted style to match) -->
+    <footer class="bg-brand-darkest mt-0">
+        <div class="footer-bottom bg-black bg-opacity-20 border-t border-brand-border">
+            <div class="max-w-6xl mx-auto px-4 py-4 text-center sm:text-left">
+                <p class="text-sm text-brand-text">Copyright © 2025 Reaper MC. All Rights Reserved.</p>
+                <p class="text-xs text-brand-text/50 mt-1">We are not affiliated with Mojang, AB.</p>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- IP Copy Feedback -->
+    <div class="copy-feedback" id="copyFeedback">IP Copied!</div>
+
+    <!-- QR Code Popup Modal -->
+    <div id="qr-modal" class="fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-70 p-4 hidden">
+        <div class="bg-brand-light border border-brand-border rounded-xl text-center p-6 max-w-sm w-full relative">
+            <button id="modal-close"
+                class="absolute -top-3 -right-3 h-8 w-8 bg-red-500 text-white rounded-full text-lg font-bold">&times;</button>
+            <h3 class="text-2xl font-bold text-white mb-4">Scan to Pay</h3>
+            <div class="p-2 bg-white rounded-lg">
+                <img id="qr-modal-image" src="" alt="Scan QR to Pay" class="w-full h-auto mx-auto rounded-md">
+            </div>
+            <p class="text-brand-text mt-4 text-sm">
+                After paying, please send a screenshot to our
+                <a href="https://discord.gg/gge9nmnJ5h" target="_blank"
+                    class="text-brand-blue hover:text-white font-semibold">Discord server</a>
+                to receive your rank.
+            </p>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // --- IP Copy Functionality ---
+            const copyFeedback = document.getElementById('copyFeedback');
+            const setupCopyButton = (buttonId) => {
+                const button = document.getElementById(buttonId);
+                if (button) {
+                    button.addEventListener('click', () => {
+                        const ipAddress = 'play.reapermc.in';
+                        const textArea = document.createElement('textarea');
+                        textArea.value = ipAddress;
+                        textArea.style.position = 'fixed'; textArea.style.opacity = '0';
+                        document.body.appendChild(textArea);
+                        textArea.focus(); textArea.select();
+                        try {
+                            document.execCommand('copy');
+                            copyFeedback.textContent = 'IP Copied to Clipboard!';
+                        } catch (err) {
+                            copyFeedback.textContent = 'Failed to copy!';
+                        }
+                        document.body.removeChild(textArea);
+                        copyFeedback.classList.add('show');
+                        setTimeout(() => copyFeedback.classList.remove('show'), 2000);
+                    });
+                }
+            };
+            setupCopyButton('ip-copy-btn');
+
+
+            // --- Skin Viewer Script ---
+            const skinUsernameInput = document.getElementById('skin-username-input');
+            const viewSkinBtn = document.getElementById('view-skin-btn');
+            const skinImage = document.getElementById('skin-image');
+            const notFoundPlaceholder = `https://placehold.co/256x512/142a3d/64748b?text=User+Not+Found`;
+
+            const fetchSkin = () => {
+                const username = skinUsernameInput.value.trim();
+                if (!username) return;
+
+                skinImage.style.opacity = '0.5';
+                const skinUrl = `https://visage.surgeplay.com/full/512/${username}`;
+                const tempImg = new Image();
+                tempImg.src = skinUrl;
+                tempImg.onload = () => { skinImage.src = skinUrl; skinImage.style.opacity = '1'; };
+                tempImg.onerror = () => { skinImage.src = notFoundPlaceholder; skinImage.style.opacity = '1'; };
+            };
+
+            viewSkinBtn.addEventListener('click', fetchSkin);
+            skinUsernameInput.addEventListener('keypress', (event) => { if (event.key === 'Enter') fetchSkin(); });
+
+            // --- Purchase Button & QR Modal (Restored) ---
+            const purchaseButtons = document.querySelectorAll('.purchase-btn');
+            const modal = document.getElementById('qr-modal');
+            const modalImage = document.getElementById('qr-modal-image');
+            const closeModalBtnQR = document.getElementById('modal-close');
+
+            function isMobileDevice() {
+                return /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+            }
+
+            purchaseButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const checkoutLink = button.dataset.checkoutLink;
+                    if (!checkoutLink) return;
+
+                    if (isMobileDevice()) {
+                        // On mobile, directly try to open the UPI link
+                        window.open(checkoutLink, '_blank');
+                    } else {
+                        // On desktop, generate and show the QR code
+                        const encodedLink = encodeURIComponent(checkoutLink);
+                        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodedLink}`;
+                        modalImage.src = qrApiUrl;
+                        modal.classList.remove('hidden');
+                    }
+                });
+            });
+
+            closeModalBtnQR.addEventListener('click', () => {
+                modal.classList.add('hidden');
+            });
+
+            // Close modal if clicking outside the content
+            modal.addEventListener('click', (event) => {
+                if (event.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+
+        });
+
+        // --- Page Loader Script ---
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500); // Wait for fade out transition (duration-500)
+            }
+        });
+    </script>
+    <script type="module" src="js/home.js"></script>
+</body>
+
+</html>

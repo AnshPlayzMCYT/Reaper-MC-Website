@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaper MC | Admin Login</title>
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Poppins', 'sans-serif'] },
+                    colors: {
+                        'brand-darkest': '#050f18',
+                        'brand-dark': '#0d1f2e',
+                        'brand-light': '#142a3d',
+                        'brand-border': '#1d3449',
+                        'brand-text': '#99aec2',
+                        'brand-blue': '#008bff'
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-brand-darkest text-brand-text min-h-screen flex items-center justify-center p-4">
+
+    <!-- Global Page Loader -->
+    <div id="page-loader"
+        class="fixed inset-0 z-[9999] bg-brand-dark flex flex-col items-center justify-center transition-opacity duration-500">
+        <i class="ri-loader-4-line text-5xl text-brand-blue animate-spin mb-4 drop-shadow-2xl"></i>
+    </div>
+
+    <!-- Modals Container -->
+    <div id="modals"></div>
+
+    <div class="max-w-md w-full">
+        <div class="text-center mb-8">
+            <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                alt="Logo" class="w-20 h-20 mx-auto mb-4 drop-shadow-[0_0_15px_rgba(0,139,255,0.3)]">
+            <h1 class="text-3xl font-black text-white mb-2">Admin Portal</h1>
+            <p class="text-brand-text">Authorized Personnel Only</p>
+        </div>
+
+        <div class="bg-brand-dark border border-brand-border rounded-xl shadow-2xl p-8 mb-6 relative overflow-hidden">
+            <div id="error-message"
+                class="hidden bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-6 text-sm font-semibold flex items-center gap-2">
+                <i class="ri-error-warning-line text-lg"></i>
+                <span id="error-text">Access Denied. You are not authorized.</span>
+            </div>
+
+            <div class="space-y-5">
+                <p class="text-sm text-center text-brand-text mb-6">Please authenticate using your designated admin
+                    Google account to access the dashboard.</p>
+                <button id="google-login-btn"
+                    class="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.1)] flex justify-center items-center gap-3">
+                    <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5">
+                    <span>Sign in with Google</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="text-center">
+            <a href="index.html"
+                class="text-sm font-semibold text-brand-text hover:text-white transition-colors flex items-center justify-center gap-1">
+                <i class="ri-arrow-left-line"></i> Return to Store
+            </a>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { auth, googleProvider } from './js/firebase-config.js';
+        import { signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+
+        const btn = document.getElementById('google-login-btn');
+        const errorBox = document.getElementById('error-message');
+        const errorText = document.getElementById('error-text');
+
+        // Note: For testing purposes, we define the API URL here to perform a quick check, 
+        // but the main enforcement happens on the `admin.html` page when loading data.
+        const API_URL = 'http://localhost:3000/api';
+
+        btn.addEventListener('click', async () => {
+            errorBox.classList.add('hidden');
+            const originalHtml = btn.innerHTML;
+            btn.innerHTML = `<i class="ri-loader-4-line animate-spin"></i> Authenticating...`;
+            btn.disabled = true;
+
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                const user = result.user;
+                const token = await user.getIdToken();
+
+                // Do a quick test fetch to the backend to see if this user is allowed
+                // If the backend accepts the token, it means the email matched ADMIN_EMAIL
+                const testRes = await fetch(`${API_URL}/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+
+                if (testRes.ok) {
+                    btn.innerHTML = `<i class="ri-check-line text-green-500"></i> Access Granted`;
+                    setTimeout(() => {
+                        window.location.href = 'admin.html';
+                    }, 500);
+                } else {
+                    // Not authorized
+                    await signOut(auth);
+                    throw new Error('You are not authorized to view the admin panel.');
+                }
+
+            } catch (error) {
+                console.error("Login failed:", error);
+                errorText.textContent = error.message.includes('authorized') ? error.message : 'Google authentication failed. Please try again.';
+                errorBox.classList.remove('hidden');
+                btn.innerHTML = originalHtml;
+                btn.disabled = false;
+            }
+        });
+
+        // Hide loader once scripts are ready
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+
+            // If already logged in, redirect
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    try {
+                        const token = await user.getIdToken();
+                        const testRes = await fetch(`${API_URL}/users`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (testRes.ok) {
+                            window.location.href = 'admin.html';
+                        } else {
+                            // Signed in but not admin, sign them out so they can try another account
+                            signOut(auth);
+                        }
+                    } catch (e) {
+                        console.error(e);
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
