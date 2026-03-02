@@ -1,5 +1,4 @@
-// Configuration
-const API_URL = '/api';
+const API_URL = window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : `${window.location.origin}/api`;
 const defaultSkinUrl = 'https://mc-heads.net/avatar/MHF_Steve/40';
 
 // DOM Elements

@@ -87,7 +87,7 @@
         const errorBox = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
 
-        const API_URL = '/api';
+        const API_URL = window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : `${window.location.origin}/api`;
 
         // Filter input to only allow numbers
         codeInput.addEventListener('input', function (e) {

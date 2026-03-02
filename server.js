@@ -36,7 +36,11 @@ if (!admin.apps.length) {
 const { authenticator } = require('otplib');
 
 const app = express();
-app.use(cors({ origin: '*' }));
+app.use(cors({
+    origin: ['https://shop.reapermc.in', 'https://reaper-mc-website.vercel.app', 'http://localhost:3000'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 app.use(express.json());
 
 // Serve static frontend files from the same directory
