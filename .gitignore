@@ -1,4 +1,3 @@
 node_modules/
-reaper-mc-store-001-firebase-adminsdk-fbsvc-787a8454c0.json
+reaper-mc-store-001-firebase-adminsdk-*.json
 .DS_Store
-.env

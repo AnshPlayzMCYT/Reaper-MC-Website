@@ -1,6 +1,3 @@
-import { auth } from './firebase-config.js';
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
 // Configuration
 const API_URL = 'http://localhost:3000/api';
 const defaultSkinUrl = 'https://mc-heads.net/avatar/MHF_Steve/40';
@@ -14,26 +11,16 @@ const modalsContainer = document.getElementById('modals');
 
 // State
 let usersList = [];
-let authToken = null;
+let authToken = localStorage.getItem('admin_token');
 
-// Enforce Auth via Firebase
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        try {
-            authToken = await user.getIdToken();
-            loadUsers();
-        } catch (error) {
-            console.error("Error getting token", error);
-            window.location.href = 'admin-login.html';
-        }
-    } else {
-        window.location.href = 'admin-login.html';
-    }
-});
+// Enforce Auth
+if (!authToken) {
+    window.location.href = 'admin-login.html';
+}
 
 const handleApiError = async (response) => {
     if (response.status === 401 || response.status === 403) {
-        await signOut(auth);
+        localStorage.removeItem('admin_token');
         window.location.href = 'admin-login.html';
         return;
     }
@@ -144,7 +131,7 @@ const formatDate = (dateString) => {
 const loadUsers = async () => {
     usersTableBody.innerHTML = `
         <tr>
-            <td colspan="5" class="p-8 text-center text-brand-text">
+            <td colspan="6" class="p-8 text-center text-brand-text">
                 <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
                 <p>Loading users...</p>
             </td>
@@ -174,7 +161,7 @@ const loadUsers = async () => {
         showNotification('Could not connect to the Backend API. Is it running?', 'error');
         usersTableBody.innerHTML = `
             <tr>
-                <td colspan="5" class="p-8 text-center text-red-400">
+                <td colspan="6" class="p-8 text-center text-red-400">
                     <i class="ri-error-warning-line text-3xl inline-block mb-2"></i>
                     <p>Failed to load users.</p>
                 </td>
@@ -188,7 +175,7 @@ const renderTable = () => {
     if (usersList.length === 0) {
         usersTableBody.innerHTML = `
             <tr>
-                <td colspan="5" class="p-8 text-center text-brand-text">
+                <td colspan="6" class="p-8 text-center text-brand-text">
                     <i class="ri-user-line text-3xl inline-block mb-2"></i>
                     <p>No users found.</p>
                 </td>
@@ -220,18 +207,19 @@ const renderTable = () => {
             }
             </td>
             <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.creationTime)}</td>
-            <td class="p-4 text-right space-x-2">
-                <button onclick="openEditModal('${user.uid}', '${displayName}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
-                    <i class="ri-edit-line"></i>
-                </button>
-                <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/20 transition-colors" title="Delete User">
-                    <i class="ri-delete-bin-line"></i>
-                </button>
-            </td>
-            <td class="p-4 text-center">
+            <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.lastSignInTime)}</td>
+            <td class="p-4 text-right space-x-4 flex items-center justify-end mr-4">
                 <button onclick="toggleDisableStatus('${user.uid}', ${!!user.disabled})" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${user.disabled ? 'bg-red-500' : 'bg-green-500'}" title="${user.disabled ? 'Enable User' : 'Disable User'}">
                     <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
                 </button>
+                <div class="space-x-2">
+                    <button onclick="openEditModal('${user.uid}', '${displayName}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
+                        <i class="ri-edit-line"></i>
+                    </button>
+                    <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/20 transition-colors" title="Delete User">
+                        <i class="ri-delete-bin-line"></i>
+                    </button>
+                </div>
             </td>
         </tr>
     `}).join('');
@@ -435,3 +423,16 @@ window.updatePassword = async (uid) => {
 
 // Initialization
 refreshBtn.addEventListener('click', loadUsers);
+
+const logoutBtn = document.getElementById('admin-logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        localStorage.removeItem('admin_token');
+        window.location.href = 'admin-login.html';
+    });
+}
+
+// Initial Data Load (If token exists)
+if (authToken) {
+    loadUsers();
+}

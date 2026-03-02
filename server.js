@@ -4,18 +4,29 @@ const cors = require('cors');
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
-// Initialize Firebase Admin with the downloaded service account key
-const serviceAccount = require('./reaper-mc-store-001-firebase-adminsdk-fbsvc-787a8454c0.json');
+// We need the serviceAccount JSON file to list and manage Firebase users via the Admin SDK
+const serviceAccount = require('./reaper-mc-store-001-firebase-adminsdk-fbsvc-cb6c444513.json');
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount)
 });
 
+const { authenticator } = require('otplib');
+
 const app = express();
-app.use(cors());
+app.use(cors({ origin: '*' }));
 app.use(express.json());
 
-// Verify Firebase JWT Middleware
+// Catch JSON parsing errors so they don't leak default Express HTML
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        console.error("Bad JSON payload received:", err.message);
+        return res.status(400).json({ error: "Invalid JSON payload format." }); // Send JSON instead of HTML
+    }
+    next();
+});
+
+// Verify Custom JWT Middleware
 const verifyToken = async (req, res, next) => {
     const bearerHeader = req.headers['authorization'];
     if (!bearerHeader) {
@@ -24,12 +35,11 @@ const verifyToken = async (req, res, next) => {
 
     const token = bearerHeader.split(' ')[1];
     try {
-        const decodedToken = await admin.auth().verifyIdToken(token);
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret_please_change');
 
-        // Check if the authenticated user's email is in the allowed Admin Emails list
-        const allowedEmails = process.env.ADMIN_EMAIL ? process.env.ADMIN_EMAIL.split(',').map(e => e.trim()) : [];
-        if (!allowedEmails.includes(decodedToken.email)) {
-            return res.status(403).json({ error: 'Access Denied: You are not authorized to view the admin panel.' });
+        // Custom token verification (it should have admin: true)
+        if (!decodedToken.admin) {
+            return res.status(403).json({ error: 'Access Denied: You are not authorized.' });
         }
 
         req.user = decodedToken;
@@ -38,6 +48,40 @@ const verifyToken = async (req, res, next) => {
         return res.status(403).json({ error: 'Access Denied: Invalid or Expired Token' });
     }
 };
+
+// Admin Login Endpoint
+app.post('/api/admin/login', (req, res) => {
+    try {
+        const { code } = req.body;
+
+        if (!code || code.length !== 6) {
+            return res.status(400).json({ error: 'Invalid code format.' });
+        }
+
+        const secret = process.env.ADMIN_TOTP_SECRET;
+        if (!secret) {
+            return res.status(500).json({ error: 'Server misconfiguration: No TOTP secret set.' });
+        }
+
+        // Verify the TOTP code
+        const isValid = authenticator.verify({ token: code, secret: secret });
+
+        if (isValid) {
+            // Issue a Custom JWT valid for 24 hours
+            const token = jwt.sign(
+                { admin: true, role: 'superadmin' },
+                process.env.JWT_SECRET || 'fallback_secret_please_change',
+                { expiresIn: '24h' }
+            );
+            return res.status(200).json({ message: 'Authentication successful', token: token });
+        } else {
+            return res.status(401).json({ error: 'Incorrect or expired code.' });
+        }
+    } catch (error) {
+        console.error("Login verification error:", error);
+        return res.status(500).json({ error: "Internal server error during login." });
+    }
+});
 
 // List all users
 app.get('/api/users', verifyToken, async (req, res) => {

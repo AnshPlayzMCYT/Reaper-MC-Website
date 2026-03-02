@@ -54,15 +54,21 @@
                 <span id="error-text">Access Denied. You are not authorized.</span>
             </div>
 
-            <div class="space-y-5">
-                <p class="text-sm text-center text-brand-text mb-6">Please authenticate using your designated admin
-                    Google account to access the dashboard.</p>
-                <button id="google-login-btn"
-                    class="w-full bg-white hover:bg-gray-100 text-gray-900 font-bold py-3 px-4 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(255,255,255,0.1)] flex justify-center items-center gap-3">
-                    <img src="https://www.google.com/favicon.ico" alt="Google" class="w-5 h-5">
-                    <span>Sign in with Google</span>
+            <form id="admin-login-form" class="space-y-6 text-center">
+                <p class="text-sm text-brand-text mb-2">Please enter the 6-digit code from your Google Authenticator
+                    app.</p>
+
+                <div>
+                    <input type="text" id="totp-code" name="totp-code" maxlength="6" pattern="[0-9]{6}" required
+                        class="w-full bg-brand-darkest border border-brand-border rounded-lg py-4 px-4 text-center text-3xl font-mono text-white tracking-[0.5em] focus:outline-none focus:border-brand-blue focus:ring-1 focus:ring-brand-blue transition-all"
+                        placeholder="••••••" autocomplete="off" autofocus>
+                </div>
+
+                <button type="submit" id="auth-submit-btn"
+                    class="w-full bg-brand-blue hover:bg-brand-blue/80 text-white font-bold py-3 px-4 rounded-lg transition-all shadow-lg flex justify-center items-center gap-2">
+                    <i class="ri-login-circle-line"></i> Verify Code
                 </button>
-            </div>
+            </form>
         </div>
 
         <div class="text-center">
@@ -73,57 +79,69 @@
         </div>
     </div>
 
-    <!-- Firebase SDK -->
-    <script type="module">
-        import { auth, googleProvider } from './js/firebase-config.js';
-        import { signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
-
-        const btn = document.getElementById('google-login-btn');
+    <!-- Script -->
+    <script>
+        const form = document.getElementById('admin-login-form');
+        const codeInput = document.getElementById('totp-code');
+        const btn = document.getElementById('auth-submit-btn');
         const errorBox = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
 
-        // Note: For testing purposes, we define the API URL here to perform a quick check, 
-        // but the main enforcement happens on the `admin.html` page when loading data.
         const API_URL = 'http://localhost:3000/api';
 
-        btn.addEventListener('click', async () => {
+        // Filter input to only allow numbers
+        codeInput.addEventListener('input', function (e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
             errorBox.classList.add('hidden');
+
+            const code = codeInput.value.trim();
+            if (code.length !== 6) {
+                errorText.textContent = 'Please enter a valid 6-digit code.';
+                errorBox.classList.remove('hidden');
+                return;
+            }
+
             const originalHtml = btn.innerHTML;
-            btn.innerHTML = `<i class="ri-loader-4-line animate-spin"></i> Authenticating...`;
+            btn.innerHTML = `<i class="ri-loader-4-line animate-spin"></i> Verifying...`;
             btn.disabled = true;
 
             try {
-                const result = await signInWithPopup(auth, googleProvider);
-                const user = result.user;
-                const token = await user.getIdToken();
+                const payload = JSON.stringify({ code: code });
 
-                // Do a quick test fetch to the backend to see if this user is allowed
-                // If the backend accepts the token, it means the email matched ADMIN_EMAIL
-                const testRes = await fetch(`${API_URL}/users`, {
-                    headers: { 'Authorization': `Bearer ${token}` }
+                const response = await fetch(`${API_URL}/admin/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: payload
                 });
 
-                if (testRes.ok) {
+                const data = await response.json();
+
+                if (response.ok && data.token) {
                     btn.innerHTML = `<i class="ri-check-line text-green-500"></i> Access Granted`;
+                    // Save custom JWT to localStorage
+                    localStorage.setItem('admin_token', data.token);
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 500);
                 } else {
-                    // Not authorized
-                    await signOut(auth);
-                    throw new Error('You are not authorized to view the admin panel.');
+                    throw new Error(data.error || 'Authentication failed. Incorrect code.');
                 }
-
             } catch (error) {
                 console.error("Login failed:", error);
-                errorText.textContent = error.message.includes('authorized') ? error.message : 'Google authentication failed. Please try again.';
+                errorText.textContent = error.message;
                 errorBox.classList.remove('hidden');
                 btn.innerHTML = originalHtml;
                 btn.disabled = false;
+                codeInput.value = '';
+                codeInput.focus();
             }
         });
 
-        // Hide loader once scripts are ready
+        // Hide loader once script is ready
         window.addEventListener('load', () => {
             const loader = document.getElementById('page-loader');
             if (loader) {
@@ -131,25 +149,20 @@
                 setTimeout(() => loader.style.display = 'none', 500);
             }
 
-            // If already logged in, redirect
-            onAuthStateChanged(auth, async (user) => {
-                if (user) {
-                    try {
-                        const token = await user.getIdToken();
-                        const testRes = await fetch(`${API_URL}/users`, {
-                            headers: { 'Authorization': `Bearer ${token}` }
-                        });
-                        if (testRes.ok) {
-                            window.location.href = 'admin.html';
-                        } else {
-                            // Signed in but not admin, sign them out so they can try another account
-                            signOut(auth);
-                        }
-                    } catch (e) {
-                        console.error(e);
+            // Check if already authenticated via Custom JWT
+            const token = localStorage.getItem('admin_token');
+            if (token) {
+                // Quick verification request
+                fetch(`${API_URL}/users`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                }).then(res => {
+                    if (res.ok) {
+                        window.location.href = 'admin.html';
+                    } else {
+                        localStorage.removeItem('admin_token');
                     }
-                }
-            });
+                }).catch(e => console.error(e));
+            }
         });
     </script>
 </body>
