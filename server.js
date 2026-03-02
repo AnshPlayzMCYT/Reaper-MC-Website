@@ -5,11 +5,31 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // We need the serviceAccount JSON file to list and manage Firebase users via the Admin SDK
-const serviceAccount = require('./reaper-mc-store-001-firebase-adminsdk-fbsvc-cb6c444513.json');
+// On local machines, we can use the json file.
+// On cloud hosts (Railway, Render), we must provide the JSON content via the FIREBASE_SERVICE_ACCOUNT environment variable.
+let serviceAccount;
 
-admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount)
-});
+if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+    try {
+        serviceAccount = JSON.parse(Buffer.from(process.env.FIREBASE_SERVICE_ACCOUNT, 'base64').toString('utf8'));
+    } catch (e) {
+        console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT environment variable. Ensure it is base64 encoded.");
+    }
+} else {
+    try {
+        serviceAccount = require('./reaper-mc-store-001-firebase-adminsdk-fbsvc-cb6c444513.json');
+    } catch (e) {
+        console.warn("No local firebase credentials JSON found, and FIREBASE_SERVICE_ACCOUNT is not set. API will lack admin powers.");
+    }
+}
+
+if (serviceAccount) {
+    admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+    });
+} else {
+    admin.initializeApp(); // Fallback to default, though it may fail permissions
+}
 
 const { authenticator } = require('otplib');
 
