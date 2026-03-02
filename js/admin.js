@@ -10,7 +10,7 @@ const modalsContainer = document.getElementById('modals');
 
 // State
 let usersList = [];
-let authToken = localStorage.getItem('admin_token');
+let authToken = sessionStorage.getItem('admin_token');
 
 // Enforce Auth
 if (!authToken) {
@@ -19,7 +19,7 @@ if (!authToken) {
 
 const handleApiError = async (response) => {
     if (response.status === 401 || response.status === 403) {
-        localStorage.removeItem('admin_token');
+        sessionStorage.removeItem('admin_token');
         window.location.href = 'admin-login.html';
         return;
     }
@@ -428,7 +428,7 @@ refreshBtn.addEventListener('click', loadUsers);
 const logoutBtn = document.getElementById('admin-logout-btn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-        localStorage.removeItem('admin_token');
+        sessionStorage.removeItem('admin_token');
         window.location.href = 'admin-login.html';
     });
 }

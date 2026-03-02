@@ -122,8 +122,8 @@
 
                 if (response.ok && data.token) {
                     btn.innerHTML = `<i class="ri-check-line text-green-500"></i> Access Granted`;
-                    // Save custom JWT to localStorage
-                    localStorage.setItem('admin_token', data.token);
+                    // Save custom JWT to sessionStorage
+                    sessionStorage.setItem('admin_token', data.token);
                     setTimeout(() => {
                         window.location.href = 'admin.html';
                     }, 500);
@@ -150,7 +150,7 @@
             }
 
             // Check if already authenticated via Custom JWT
-            const token = localStorage.getItem('admin_token');
+            const token = sessionStorage.getItem('admin_token');
             if (token) {
                 // Quick verification request
                 fetch(`${API_URL}/users`, {
@@ -159,7 +159,7 @@
                     if (res.ok) {
                         window.location.href = 'admin.html';
                     } else {
-                        localStorage.removeItem('admin_token');
+                        sessionStorage.removeItem('admin_token');
                     }
                 }).catch(e => console.error(e));
             }
