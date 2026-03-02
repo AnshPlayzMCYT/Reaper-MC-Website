@@ -207,17 +207,19 @@ const renderTable = () => {
             </td>
             <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.creationTime)}</td>
             <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.lastSignInTime)}</td>
-            <td class="p-4 text-right space-x-4 flex items-center justify-end mr-4">
-                <button onclick="toggleDisableStatus('${user.uid}', ${!!user.disabled})" class="relative inline-flex items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${user.disabled ? 'bg-red-500' : 'bg-green-500'}" title="${user.disabled ? 'Enable User' : 'Disable User'}">
-                    <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
-                </button>
-                <div class="space-x-2">
-                    <button onclick="openEditModal('${user.uid}', '${displayName}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
-                        <i class="ri-edit-line"></i>
+            <td class="p-4">
+                <div class="flex flex-col sm:flex-row items-end sm:items-center justify-end gap-3 sm:gap-4">
+                    <button onclick="toggleDisableStatus('${user.uid}', ${!!user.disabled})" class="relative inline-flex shrink-0 items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${user.disabled ? 'bg-red-500' : 'bg-green-500'}" title="${user.disabled ? 'Enable User' : 'Disable User'}">
+                        <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
                     </button>
-                    <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/20 transition-colors" title="Delete User">
-                        <i class="ri-delete-bin-line"></i>
-                    </button>
+                    <div class="flex gap-2 shrink-0">
+                        <button onclick="openEditModal('${user.uid}', '${displayName}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
+                            <i class="ri-edit-line z-10 relative"></i>
+                        </button>
+                        <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/20 transition-colors" title="Delete User">
+                            <i class="ri-delete-bin-line z-10 relative"></i>
+                        </button>
+                    </div>
                 </div>
             </td>
         </tr>
