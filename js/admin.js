@@ -1,5 +1,5 @@
 // Configuration
-const API_URL = 'http://localhost:3000/api';
+const API_URL = '/api';
 const defaultSkinUrl = 'https://mc-heads.net/avatar/MHF_Steve/40';
 
 // DOM Elements

@@ -17,6 +17,9 @@ const app = express();
 app.use(cors({ origin: '*' }));
 app.use(express.json());
 
+// Serve static frontend files from the same directory
+app.use(express.static(__dirname));
+
 // Catch JSON parsing errors so they don't leak default Express HTML
 app.use((err, req, res, next) => {
     if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
