@@ -81,13 +81,21 @@ app.post('/api/admin/login', (req, res) => {
             return res.status(400).json({ error: 'Invalid code format.' });
         }
 
-        const secret = process.env.ADMIN_TOTP_SECRET;
-        if (!secret) {
+        const secrets = process.env.ADMIN_TOTP_SECRET;
+        if (!secrets) {
             return res.status(500).json({ error: 'Server misconfiguration: No TOTP secret set.' });
         }
 
-        // Verify the TOTP code
-        const isValid = authenticator.verify({ token: code, secret: secret });
+        // Verify the TOTP code against all allowed secrets
+        const secretArray = secrets.split(',').map(s => s.trim());
+        let isValid = false;
+
+        for (const secret of secretArray) {
+            if (authenticator.verify({ token: code, secret: secret })) {
+                isValid = true;
+                break;
+            }
+        }
 
         if (isValid) {
             // Issue a Custom JWT valid for 24 hours
