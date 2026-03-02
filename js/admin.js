@@ -14,13 +14,13 @@ let authToken = sessionStorage.getItem('admin_token');
 
 // Enforce Auth
 if (!authToken) {
-    window.location.href = 'admin-login.html';
+    window.location.href = '/admin-login';
 }
 
 const handleApiError = async (response) => {
     if (response.status === 401 || response.status === 403) {
         sessionStorage.removeItem('admin_token');
-        window.location.href = 'admin-login.html';
+        window.location.href = '/admin-login';
         return;
     }
     const data = await response.json();
@@ -429,7 +429,7 @@ const logoutBtn = document.getElementById('admin-logout-btn');
 if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
         sessionStorage.removeItem('admin_token');
-        window.location.href = 'admin-login.html';
+        window.location.href = '/admin-login';
     });
 }
 

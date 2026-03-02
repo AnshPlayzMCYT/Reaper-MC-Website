@@ -61,7 +61,7 @@ const renderLoginUI = (user) => {
     } else {
         // User is signed out.
         loginDisplayArea.innerHTML = `
-            <a href="login.html" class="bg-secondary hover:bg-secondary/80 text-white px-5 py-2 rounded-md font-bold transition-colors w-full sm:w-auto inline-block text-center">Please Login</a>
+            <a href="/login" class="bg-secondary hover:bg-secondary/80 text-white px-5 py-2 rounded-md font-bold transition-colors w-full sm:w-auto inline-block text-center">Please Login</a>
         `;
     }
 };
