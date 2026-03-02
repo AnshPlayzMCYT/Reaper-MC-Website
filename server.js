@@ -23,12 +23,14 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     }
 }
 
-if (serviceAccount) {
-    admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-    });
-} else {
-    admin.initializeApp(); // Fallback to default, though it may fail permissions
+if (!admin.apps.length) {
+    if (serviceAccount) {
+        admin.initializeApp({
+            credential: admin.credential.cert(serviceAccount)
+        });
+    } else {
+        admin.initializeApp(); // Fallback to default, though it may fail permissions
+    }
 }
 
 const { authenticator } = require('otplib');
@@ -178,7 +180,10 @@ app.post('/api/users/:uid/username', verifyToken, async (req, res) => {
     }
 });
 
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Admin Server listening on port ${PORT}`);
-});
+const PORT = process.env.PORT || 3000;
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+    app.listen(PORT, () => {
+        console.log(`Admin Server listening on port ${PORT}`);
+    });
+}
+module.exports = app;
