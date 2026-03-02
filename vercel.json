@@ -1,4 +1,5 @@
 {
+    "name": "reaper-mc-website",
     "version": 2,
     "builds": [
         {
