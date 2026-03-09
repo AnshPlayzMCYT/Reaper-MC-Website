@@ -17,9 +17,9 @@ if (process.env.FIREBASE_SERVICE_ACCOUNT) {
     }
 } else {
     try {
-        serviceAccount = require('./reaper-mc-store-001-firebase-adminsdk-fbsvc-cb6c444513.json');
+        serviceAccount = require('./firebase-creds.js');
     } catch (e) {
-        console.warn("No local firebase credentials JSON found, and FIREBASE_SERVICE_ACCOUNT is not set. API will lack admin powers.");
+        console.warn("No local firebase credentials found, and FIREBASE_SERVICE_ACCOUNT is not set. API will lack admin powers.");
     }
 }
 
