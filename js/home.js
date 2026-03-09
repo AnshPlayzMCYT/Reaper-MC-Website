@@ -4,16 +4,36 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 const loginDisplayArea = document.getElementById('login-display-area');
 const defaultSkinUrl = 'https://mc-heads.net/avatar/MHF_Steve/40';
 
-const renderLoginUI = (user) => {
+const renderLoginUI = async (user) => {
     if (user) {
         // User is signed in.
+        // Fetch custom claims to get rank
+        const idTokenResult = await user.getIdTokenResult(true);
+        const rank = idTokenResult.claims.rank || 'Member';
+
+        // Styling for rank badge
+        let rankBadgeHtml = '';
+        if (rank !== 'Member') {
+            let rankClass = 'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ml-2 ';
+            if (rank === 'VIP') rankClass += 'bg-primary/20 text-primary border border-primary/30';
+            else if (rank === 'VIP+') rankClass += 'bg-secondary/20 text-secondary border border-secondary/30';
+            else if (rank === 'MVP') rankClass += 'bg-pink-500/20 text-pink-500 border border-pink-500/30';
+            else if (rank === 'MVP+') rankClass += 'bg-blue-500/20 text-blue-500 border border-blue-500/30';
+            else if (rank === 'Legend') rankClass += 'bg-orange-500/20 text-orange-400 border border-orange-500/30';
+            else if (rank === 'Immortal') rankClass += 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30';
+            
+            rankBadgeHtml = `<span class="${rankClass}">${rank}</span>`;
+        }
+
         // We set the displayName to the Minecraft username at signup.
         const displayName = user.displayName || user.email.split('@')[0];
 
         loginDisplayArea.innerHTML = `
             <div class="flex items-center space-x-3">
                 <img src="https://mc-heads.net/avatar/${displayName}/40" class="h-10 w-10 rounded-md" style="image-rendering: pixelated;" onerror="this.src='${defaultSkinUrl}'">
-                <span class="font-semibold text-white">${displayName}</span>
+                <div class="flex flex-col">
+                    <span class="font-semibold text-white flex items-center">${displayName} ${rankBadgeHtml}</span>
+                </div>
             </div>
             <button id="logout-btn" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-md text-sm font-semibold transition-colors">Logout</button>
         `;

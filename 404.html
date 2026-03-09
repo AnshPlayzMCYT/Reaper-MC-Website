@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reaper MC | 404 Not Found</title>
+    <!-- Tailwind and Fonts -->
+    <script src="https://cdn.tailwindcss.com/3.4.16"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Poppins', 'sans-serif'],
+                    },
+                    colors: {
+                        'brand-darkest': '#050f18',
+                        'brand-dark': '#0d1f2e',
+                        'brand-light': '#142a3d',
+                        'brand-border': '#1d3449',
+                        'brand-text': '#99aec2',
+                        'brand-blue': '#008bff',
+                        'brand-green': '#75e12f',
+                        'brand-green-hover': '#9bff5b',
+                        'brand-discord': '#5865F2',
+                        primary: '#00bcd4',
+                        secondary: '#8b5cf6',
+                    },
+                    keyframes: {
+                        loading: {
+                            '0%': { transform: 'translateX(-100%)' },
+                            '100%': { transform: 'translateX(200%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #0d1f2e;
+            color: #99aec2;
+        }
+
+        .hero-section {
+            background: linear-gradient(0deg, #0d1f2e 0%, rgba(13, 31, 46, 0.7) 100%), url('https://readdy.ai/api/search-image?query=mystical%20dark%20fantasy%20landscape%20with%20swirling%20purple%20and%20cyan%20energy%20portals%2C%20ethereal%20mists%2C%20floating%20crystal%20formations%2C%20dramatic%20lighting%2C%20cinematic%20atmosphere%2C%20dark%20magical%20realm%20with%20glowing%20elements%2C%20mysterious%20ancient%20structures%20in%20background&width=1920&height=1080&seq=hero001&orientation=landscape');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .header-btn {
+            transition: transform 0.15s ease-out, background-color 0.15s ease-out;
+        }
+
+        .header-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .header-btn:active {
+            transform: scale(0.95);
+        }
+
+        .glitch-text {
+            font-size: 8rem;
+            font-weight: 900;
+            line-height: 1;
+            color: #fff;
+            text-shadow:
+                0.05em 0 0 rgba(255, 0, 0, 0.75),
+                -0.025em -0.05em 0 rgba(0, 255, 0, 0.75),
+                0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+            animation: glitch 500ms infinite;
+        }
+
+        @keyframes glitch {
+            0% {
+                text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.05em -0.025em 0 rgba(0, 255, 0, 0.75), -0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+
+            14% {
+                text-shadow: 0.05em 0 0 rgba(255, 0, 0, 0.75), -0.05em -0.025em 0 rgba(0, 255, 0, 0.75), -0.025em 0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+
+            15% {
+                text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+
+            49% {
+                text-shadow: -0.05em -0.025em 0 rgba(255, 0, 0, 0.75), 0.025em 0.025em 0 rgba(0, 255, 0, 0.75), -0.05em -0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+
+            50% {
+                text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+
+            99% {
+                text-shadow: 0.025em 0.05em 0 rgba(255, 0, 0, 0.75), 0.05em 0 0 rgba(0, 255, 0, 0.75), 0 -0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+
+            100% {
+                text-shadow: -0.025em 0 0 rgba(255, 0, 0, 0.75), -0.025em -0.025em 0 rgba(0, 255, 0, 0.75), -0.025em -0.05em 0 rgba(0, 0, 255, 0.75);
+            }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 640px) {
+            .glitch-text {
+                font-size: 5rem;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-brand-dark flex flex-col min-h-screen hero-section">
+
+    <!-- Global Page Loader -->
+    <div id="page-loader"
+        class="fixed inset-0 z-[9999] bg-brand-dark flex flex-col items-center justify-center transition-opacity duration-500">
+        <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+            alt="Loading..." class="w-24 h-24 drop-shadow-2xl mb-4 animate-pulse">
+        <div class="w-48 h-1.5 bg-brand-darkest rounded-full overflow-hidden relative">
+            <div
+                class="absolute top-0 left-0 h-full w-1/2 bg-brand-blue rounded-full animate-[loading_1.5s_ease-in-out_infinite]">
+            </div>
+        </div>
+    </div>
+
+    <!-- Header Section -->
+    <header class="p-4 w-full border-b border-brand-border/50 bg-brand-dark/50 backdrop-blur-sm">
+        <nav class="max-w-7xl mx-auto flex justify-between items-center">
+            <!-- Left Links -->
+            <div class="flex items-center gap-2">
+                <a href="index.html"
+                    class="header-btn bg-brand-blue hover:opacity-90 text-white font-bold py-2 px-4 rounded-md text-sm sm:text-base">Home</a>
+                <a href="index.html#ranks"
+                    class="header-btn bg-secondary hover:bg-secondary/80 text-white font-bold py-2 px-4 rounded-md text-sm sm:text-base">Store</a>
+            </div>
+            <!-- Center Logo -->
+            <div class="hidden md:flex absolute left-1/2 transform -translate-x-1/2 items-center space-x-3">
+                <a href="index.html" class="flex items-center space-x-3 hover:scale-105 transition-transform">
+                    <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                        alt="Reaper MC Logo" class="h-10">
+                    <div class="hidden lg:block">
+                        <h3 class="font-black text-white text-lg leading-none">Reaper MC</h3>
+                    </div>
+                </a>
+            </div>
+            <!-- Right Links & Auth -->
+            <div class="flex items-center gap-4">
+                <div id="login-display-area" class="flex items-center justify-center space-x-4">
+                    <!-- Login/Logout UI injected here by home.js -->
+                </div>
+                <a href="https://discord.gg/gge9nmnJ5h" target="_blank"
+                    class="header-btn bg-brand-discord hover:opacity-90 text-white font-bold p-2 rounded-md">
+                    <i class="ri-discord-fill text-xl"></i>
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- 404 Content Area -->
+    <main class="flex-grow flex items-center justify-center z-10 relative">
+        <div class="text-center px-4">
+            <h1 class="glitch-text mb-4 select-none" data-text="404">404</h1>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Page Not Found</h2>
+            <p class="text-lg md:text-xl text-brand-text mb-8 max-w-lg mx-auto leading-relaxed">
+                Oops! It looks like you've wandered into the void. The page you are looking for has been moved, deleted,
+                or never existed.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center items-center gap-4">
+                <a href="index.html"
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-slate-900 font-bold py-3 px-8 rounded-md transition-transform hover:scale-105 shadow-lg shadow-primary/20">
+                    <i class="ri-home-fill text-xl"></i> Back to Home
+                </a>
+                <a href="https://discord.gg/gge9nmnJ5h" target="_blank"
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-brand-light border border-brand-border hover:bg-brand-border text-white font-bold py-3 px-8 rounded-md transition-transform hover:scale-105 shadow-lg">
+                    <i class="ri-customer-service-2-fill text-xl"></i> Support
+                </a>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-brand-darkest mt-auto z-10 relative">
+        <div class="footer-bottom bg-black bg-opacity-20 border-t border-brand-border">
+            <div
+                class="max-w-6xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center text-center sm:text-left">
+                <div>
+                    <p class="text-sm text-brand-text">Copyright © 2026 Reaper MC. All Rights Reserved.</p>
+                    <p class="text-xs text-brand-text/50 mt-1">We are not affiliated with Mojang, AB.</p>
+                </div>
+                <a href="admin-login.html"
+                    class="mt-4 sm:mt-0 text-xs text-brand-text/30 hover:text-brand-text transition-colors">Admin
+                    Portal</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // --- Page Loader Script ---
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('page-loader');
+            if (loader) {
+                loader.style.opacity = '0';
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 500); // Wait for fade out transition (duration-500)
+            }
+        });
+    </script>
+    <script type="module" src="js/home.js"></script>
+</body>
+
+</html>

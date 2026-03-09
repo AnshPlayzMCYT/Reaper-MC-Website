@@ -43,8 +43,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Serve static frontend files from the same directory
-app.use(express.static(__dirname));
+// Serve static frontend files from the same directory, automatically appending .html to clean URLs
+app.use(express.static(__dirname, { extensions: ['html'] }));
 
 // Catch JSON parsing errors so they don't leak default Express HTML
 app.use((err, req, res, next) => {
@@ -182,6 +182,39 @@ app.post('/api/users/:uid/username', verifyToken, async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
+});
+// Update user rank (Custom Claims)
+app.post('/api/users/:uid/rank', verifyToken, async (req, res) => {
+    const { uid } = req.params;
+    const { rank } = req.body;
+
+    const validRanks = ['Member', 'VIP', 'VIP+', 'MVP', 'MVP+', 'Legend', 'Immortal'];
+    if (rank && !validRanks.includes(rank)) {
+        return res.status(400).json({ error: 'Invalid rank format.' });
+    }
+
+    try {
+        const userRecord = await admin.auth().getUser(uid);
+        const currentClaims = userRecord.customClaims || {};
+        
+        let newClaims = { ...currentClaims };
+        if (!rank || rank === 'Member') {
+            delete newClaims.rank; // Member is default, remove claim
+            if (Object.keys(newClaims).length === 0) newClaims = null;
+        } else {
+            newClaims.rank = rank;
+        }
+
+        await admin.auth().setCustomUserClaims(uid, newClaims);
+        res.status(200).json({ message: 'Rank updated successfully' });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+const path = require('path');
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, '404.html'));
 });
 
 const PORT = process.env.PORT || 3000;

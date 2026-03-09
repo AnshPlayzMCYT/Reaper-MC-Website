@@ -130,7 +130,7 @@ const formatDate = (dateString) => {
 const loadUsers = async () => {
     usersTableBody.innerHTML = `
         <tr>
-            <td colspan="6" class="p-8 text-center text-brand-text">
+            <td colspan="7" class="p-8 text-center text-brand-text">
                 <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
                 <p>Loading users...</p>
             </td>
@@ -174,7 +174,7 @@ const renderTable = () => {
     if (usersList.length === 0) {
         usersTableBody.innerHTML = `
             <tr>
-                <td colspan="6" class="p-8 text-center text-brand-text">
+                <td colspan="7" class="p-8 text-center text-brand-text">
                     <i class="ri-user-line text-3xl inline-block mb-2"></i>
                     <p>No users found.</p>
                 </td>
@@ -186,6 +186,16 @@ const renderTable = () => {
     usersTableBody.innerHTML = usersList.map(user => {
         const displayName = user.displayName || 'Unknown';
         const imgName = user.displayName ? user.displayName : 'MHF_Steve';
+        const rank = (user.customClaims && user.customClaims.rank) ? user.customClaims.rank : 'Member';
+        
+        // Setup rank styling
+        let rankClass = 'bg-brand-border text-brand-text';
+        if (rank === 'VIP') rankClass = 'bg-primary/20 text-primary border border-primary/30';
+        else if (rank === 'VIP+') rankClass = 'bg-secondary/20 text-secondary border border-secondary/30';
+        else if (rank === 'MVP') rankClass = 'bg-pink-500/20 text-pink-500 border border-pink-500/30';
+        else if (rank === 'MVP+') rankClass = 'bg-blue-500/20 text-blue-500 border border-blue-500/30';
+        else if (rank === 'Legend') rankClass = 'bg-orange-500/20 text-orange-400 border border-orange-500/30';
+        else if (rank === 'Immortal') rankClass = 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30';
 
         return `
         <tr class="hover:bg-brand-light/30 transition-colors group">
@@ -199,6 +209,9 @@ const renderTable = () => {
                 </div>
             </td>
             <td class="p-4 text-sm text-brand-text">${user.email}</td>
+            <td class="p-4 text-sm font-bold">
+                <span class="px-2 py-1 rounded text-xs ${rankClass}">${rank}</span>
+            </td>
             <td class="p-4 text-sm">
                 ${user.disabled
                 ? '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-semibold border border-red-500/30">Disabled</span>'
@@ -213,7 +226,7 @@ const renderTable = () => {
                         <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
                     </button>
                     <div class="flex gap-2 shrink-0">
-                        <button onclick="openEditModal('${user.uid}', '${displayName}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
+                        <button onclick="openEditModal('${user.uid}', '${displayName}', '${rank}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
                             <i class="ri-edit-line z-10 relative"></i>
                         </button>
                         <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/20 transition-colors" title="Delete User">
@@ -298,7 +311,10 @@ const deleteUser = async (uid) => {
 
 // --- Modals ---
 
-window.openEditModal = (uid, currentUsername) => {
+window.openEditModal = (uid, currentUsername, currentRank) => {
+    const ranks = ['Member', 'VIP', 'VIP+', 'MVP', 'MVP+', 'Legend', 'Immortal'];
+    const rankOptions = ranks.map(r => `<option value="${r}" ${r === currentRank ? 'selected' : ''}>${r}</option>`).join('');
+
     const modalHtml = `
         <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
             <div class="bg-brand-light border border-brand-border rounded-xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
@@ -318,6 +334,19 @@ window.openEditModal = (uid, currentUsername) => {
                             <input type="text" id="edit-username-input" value="${currentUsername === 'Unknown' ? '' : currentUsername}" placeholder="New Username" 
                                 class="flex-grow bg-brand-dark border border-brand-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-blue">
                             <button onclick="updateUsername('${uid}')" class="bg-brand-blue hover:bg-brand-blue/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Update Rank Form -->
+                    <div class="bg-brand-darkest p-4 rounded-lg border border-brand-border">
+                        <h4 class="font-semibold text-white mb-3 text-sm">Change Rank</h4>
+                        <div class="flex gap-2">
+                            <select id="edit-rank-input" class="flex-grow bg-brand-dark border border-brand-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-blue font-semibold">
+                                ${rankOptions}
+                            </select>
+                            <button onclick="updateRank('${uid}')" class="bg-orange-500 hover:bg-orange-500/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
                                 Update
                             </button>
                         </div>
@@ -412,6 +441,40 @@ window.updatePassword = async (uid) => {
                     showNotification('Password changed successfully.');
                     closeModal('edit-modal');
                     input.value = '';
+                } else {
+                    await handleApiError(response);
+                }
+            } catch (error) {
+                showNotification(error.message, 'error');
+            }
+        }
+    );
+};
+
+window.updateRank = async (uid) => {
+    const input = document.getElementById('edit-rank-input');
+    const rank = input.value;
+
+    showConfirmModal(
+        `Change Rank`,
+        `Are you sure you want to assign the rank <strong class="text-white">${rank}</strong> to this user?`,
+        `Assign Rank`,
+        `bg-orange-500 hover:bg-orange-600`,
+        async () => {
+            try {
+                const response = await fetch(`${API_URL}/users/${uid}/rank`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ rank })
+                });
+
+                if (response.ok) {
+                    showNotification('Rank changed successfully.');
+                    closeModal('edit-modal');
+                    loadUsers();
                 } else {
                     await handleApiError(response);
                 }

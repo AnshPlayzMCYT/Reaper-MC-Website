@@ -15,10 +15,18 @@
             "use": "@vercel/static"
         }
     ],
-    "rewrites": [
+    "routes": [
         {
-            "source": "/api/(.*)",
-            "destination": "/server.js"
+            "src": "/api/(.*)",
+            "dest": "/server.js"
+        },
+        {
+            "handle": "filesystem"
+        },
+        {
+            "src": "/(.*)",
+            "status": 404,
+            "dest": "/404.html"
         }
     ],
     "cleanUrls": true,
