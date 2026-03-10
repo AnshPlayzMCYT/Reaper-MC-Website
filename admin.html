@@ -28,9 +28,30 @@
             }
         }
     </script>
+
+    <style>
+        /* Hide table on mobile, show cards; flip on md+ */
+        @media (max-width: 767px) {
+            .desktop-table { display: none !important; }
+            .mobile-cards  { display: block !important; }
+        }
+        @media (min-width: 768px) {
+            .desktop-table { display: block !important; }
+            .mobile-cards  { display: none !important; }
+        }
+
+        /* Subtle card hover lift */
+        .user-card {
+            transition: transform 0.18s ease, box-shadow 0.18s ease;
+        }
+        .user-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 32px 0 rgba(0,139,255,0.10);
+        }
+    </style>
 </head>
 
-<body class="bg-brand-darkest text-brand-text min-h-screen p-4 sm:p-8">
+<body class="bg-brand-darkest text-brand-text min-h-screen p-3 sm:p-6 lg:p-8">
 
     <!-- Global Page Loader -->
     <div id="page-loader"
@@ -42,79 +63,80 @@
     <div id="modals"></div>
 
     <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <header
-            class="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8 bg-brand-dark border border-brand-border p-6 rounded-xl shadow-lg">
-            <div class="flex items-center gap-4">
+
+        <!-- ── Header ── -->
+        <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 lg:mb-8 bg-brand-dark border border-brand-border p-4 sm:p-6 rounded-xl shadow-lg">
+            <div class="flex items-center gap-3 sm:gap-4">
                 <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
-                    alt="Logo" class="w-12 h-12">
+                    alt="Logo" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0">
                 <div>
-                    <h1 class="text-2xl font-black text-white">Admin Dashboard</h1>
-                    <p class="text-sm">Manage users and store content</p>
+                    <h1 class="text-xl sm:text-2xl font-black text-white leading-tight">Admin Dashboard</h1>
+                    <p class="text-xs sm:text-sm">Manage users and store content</p>
                 </div>
             </div>
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
                 <a href="/"
-                    class="flex items-center justify-center gap-2 bg-brand-light hover:bg-brand-border text-white px-4 py-2 rounded-lg transition-colors text-sm font-semibold shadow-sm border border-brand-border flex-1 sm:flex-none">
-                    <i class="ri-home-4-line text-lg"></i> Store
+                    class="flex items-center justify-center gap-2 bg-brand-light hover:bg-brand-border text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm font-semibold border border-brand-border flex-1 sm:flex-none">
+                    <i class="ri-home-4-line text-base sm:text-lg"></i>
+                    <span>Store</span>
                 </a>
                 <button id="admin-logout-btn"
-                    class="flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/50 px-4 py-2 rounded-lg transition-all text-sm font-semibold shadow-sm flex-1 sm:flex-none">
-                    <i class="ri-logout-box-r-line text-lg"></i> Logout
+                    class="flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/50 px-3 sm:px-4 py-2 rounded-lg transition-all text-sm font-semibold flex-1 sm:flex-none">
+                    <i class="ri-logout-box-r-line text-base sm:text-lg"></i>
+                    <span>Logout</span>
                 </button>
             </div>
         </header>
 
-        <!-- Stats row (Placeholder for future) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-brand-light border border-brand-border rounded-xl p-6 shadow-md">
+        <!-- ── Stats row ── -->
+        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 lg:mb-8">
+            <div class="bg-brand-light border border-brand-border rounded-xl p-4 sm:p-6 shadow-md">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-sm font-semibold mb-1 text-brand-text">Total Users</p>
-                        <p class="text-3xl font-black text-white" id="stat-total-users">-</p>
+                        <p class="text-xs sm:text-sm font-semibold mb-1 text-brand-text">Total Users</p>
+                        <p class="text-2xl sm:text-3xl font-black text-white" id="stat-total-users">-</p>
                     </div>
-                    <div class="bg-brand-darkest p-3 rounded-lg text-brand-blue">
-                        <i class="ri-group-line text-2xl"></i>
+                    <div class="bg-brand-darkest p-2 sm:p-3 rounded-lg text-brand-blue">
+                        <i class="ri-group-line text-xl sm:text-2xl"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Notification Banner -->
-        <div id="admin-notification" class="hidden rounded-lg p-4 mb-6 text-sm font-semibold transition-all"></div>
+        <!-- ── Notification Banner ── -->
+        <div id="admin-notification" class="hidden rounded-lg p-4 mb-4 sm:mb-6 text-sm font-semibold transition-all"></div>
 
-        <!-- Users Table -->
+        <!-- ── Users Section ── -->
         <div class="bg-brand-dark border border-brand-border rounded-xl shadow-lg overflow-hidden">
-            <div
-                class="p-6 border-b border-brand-border flex flex-col sm:flex-row gap-4 justify-between items-center bg-brand-light/50">
-                <h2 class="text-xl font-bold text-white flex items-center gap-2">
+
+            <!-- Section Header -->
+            <div class="p-4 sm:p-6 border-b border-brand-border flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center bg-brand-light/50">
+                <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
                     <i class="ri-user-settings-line text-brand-blue"></i>
                     User Management
                 </h2>
                 <button id="refresh-users-btn"
-                    class="text-brand-text hover:text-white transition-colors bg-brand-darkest p-2 rounded-lg border border-brand-border hover:border-brand-blue/50 group">
-                    <i
-                        class="ri-refresh-line group-hover:rotate-180 transition-transform duration-500 inline-block"></i>
+                    class="flex items-center gap-2 text-brand-text hover:text-white transition-colors bg-brand-darkest px-3 py-2 rounded-lg border border-brand-border hover:border-brand-blue/50 text-sm group w-full sm:w-auto justify-center sm:justify-start">
+                    <i class="ri-refresh-line group-hover:rotate-180 transition-transform duration-500 inline-block"></i>
                     Refresh
                 </button>
             </div>
 
-            <div class="overflow-x-auto">
+            <!-- ── Desktop Table (md+) ── -->
+            <div class="desktop-table overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr
-                            class="bg-brand-darkest border-b border-brand-border text-xs uppercase tracking-wider text-brand-text">
+                        <tr class="bg-brand-darkest border-b border-brand-border text-xs uppercase tracking-wider text-brand-text">
                             <th class="p-4 font-semibold">Player</th>
                             <th class="p-4 font-semibold">Email</th>
                             <th class="p-4 font-semibold">Rank</th>
                             <th class="p-4 font-semibold">Status</th>
-                            <th class="p-4 font-semibold">Joined At</th>
+                            <th class="p-4 font-semibold">Joined</th>
                             <th class="p-4 font-semibold">Last Login</th>
                             <th class="p-4 font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody id="users-table-body" class="divide-y divide-brand-border">
-                        <!-- Users will be injected here via JS -->
                         <tr>
                             <td colspan="7" class="p-8 text-center text-brand-text">
                                 <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
@@ -124,8 +146,16 @@
                     </tbody>
                 </table>
             </div>
-        </div>
 
+            <!-- ── Mobile Cards (< md) ── -->
+            <div id="users-cards-container" class="mobile-cards divide-y divide-brand-border">
+                <div class="p-8 text-center text-brand-text">
+                    <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
+                    <p>Loading users...</p>
+                </div>
+            </div>
+
+        </div>
     </div>
 
     <script type="module" src="js/admin.js"></script>
@@ -134,9 +164,7 @@
             const loader = document.getElementById('page-loader');
             if (loader) {
                 loader.style.opacity = '0';
-                setTimeout(() => {
-                    loader.style.display = 'none';
-                }, 500);
+                setTimeout(() => { loader.style.display = 'none'; }, 500);
             }
         });
     </script>

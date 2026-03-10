@@ -3,6 +3,7 @@ const defaultSkinUrl = 'https://mc-heads.net/avatar/MHF_Steve/40';
 
 // DOM Elements
 const usersTableBody = document.getElementById('users-table-body');
+const usersCardsContainer = document.getElementById('users-cards-container');
 const statTotalUsers = document.getElementById('stat-total-users');
 const refreshBtn = document.getElementById('refresh-users-btn');
 const notificationBanner = document.getElementById('admin-notification');
@@ -128,14 +129,20 @@ const formatDate = (dateString) => {
 
 // Fetch Users
 const loadUsers = async () => {
-    usersTableBody.innerHTML = `
+    const loadingHtmlTable = `
         <tr>
             <td colspan="7" class="p-8 text-center text-brand-text">
                 <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
                 <p>Loading users...</p>
             </td>
-        </tr>
-    `;
+        </tr>`;
+    const loadingHtmlCard = `
+        <div class="p-8 text-center text-brand-text">
+            <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
+            <p>Loading users...</p>
+        </div>`;
+    usersTableBody.innerHTML = loadingHtmlTable;
+    usersCardsContainer.innerHTML = loadingHtmlCard;
 
     try {
         if (!authToken) return;
@@ -158,44 +165,54 @@ const loadUsers = async () => {
     } catch (error) {
         console.error('Error loading users:', error);
         showNotification('Could not connect to the Backend API. Is it running?', 'error');
-        usersTableBody.innerHTML = `
+        const errHtmlTable = `
             <tr>
-                <td colspan="6" class="p-8 text-center text-red-400">
+                <td colspan="7" class="p-8 text-center text-red-400">
                     <i class="ri-error-warning-line text-3xl inline-block mb-2"></i>
                     <p>Failed to load users.</p>
                 </td>
-            </tr>
-        `;
+            </tr>`;
+        const errHtmlCard = `
+            <div class="p-8 text-center text-red-400">
+                <i class="ri-error-warning-line text-3xl inline-block mb-2"></i>
+                <p>Failed to load users.</p>
+            </div>`;
+        usersTableBody.innerHTML = errHtmlTable;
+        usersCardsContainer.innerHTML = errHtmlCard;
     }
 };
 
-// Render Table
+// Shared helper: get rank badge classes
+const getRankClass = (rank) => {
+    if (rank === 'VIP')     return 'bg-primary/20 text-primary border border-primary/30';
+    if (rank === 'VIP+')    return 'bg-secondary/20 text-secondary border border-secondary/30';
+    if (rank === 'MVP')     return 'bg-pink-500/20 text-pink-500 border border-pink-500/30';
+    if (rank === 'MVP+')    return 'bg-blue-500/20 text-blue-500 border border-blue-500/30';
+    if (rank === 'Legend')  return 'bg-orange-500/20 text-orange-400 border border-orange-500/30';
+    if (rank === 'Immortal')return 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30';
+    return 'bg-brand-border text-brand-text';
+};
+
+// Render Table (desktop) + Cards (mobile)
 const renderTable = () => {
     if (usersList.length === 0) {
-        usersTableBody.innerHTML = `
-            <tr>
-                <td colspan="7" class="p-8 text-center text-brand-text">
-                    <i class="ri-user-line text-3xl inline-block mb-2"></i>
-                    <p>No users found.</p>
-                </td>
-            </tr>
-        `;
+        const emptyHtml = `
+            <i class="ri-user-line text-3xl inline-block mb-2"></i>
+            <p>No users found.</p>`;
+        usersTableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-brand-text">${emptyHtml}</td></tr>`;
+        usersCardsContainer.innerHTML = `<div class="p-8 text-center text-brand-text">${emptyHtml}</div>`;
         return;
     }
 
+    // ── Desktop rows ──
     usersTableBody.innerHTML = usersList.map(user => {
         const displayName = user.displayName || 'Unknown';
-        const imgName = user.displayName ? user.displayName : 'MHF_Steve';
+        const imgName = user.displayName || 'MHF_Steve';
         const rank = (user.customClaims && user.customClaims.rank) ? user.customClaims.rank : 'Member';
-        
-        // Setup rank styling
-        let rankClass = 'bg-brand-border text-brand-text';
-        if (rank === 'VIP') rankClass = 'bg-primary/20 text-primary border border-primary/30';
-        else if (rank === 'VIP+') rankClass = 'bg-secondary/20 text-secondary border border-secondary/30';
-        else if (rank === 'MVP') rankClass = 'bg-pink-500/20 text-pink-500 border border-pink-500/30';
-        else if (rank === 'MVP+') rankClass = 'bg-blue-500/20 text-blue-500 border border-blue-500/30';
-        else if (rank === 'Legend') rankClass = 'bg-orange-500/20 text-orange-400 border border-orange-500/30';
-        else if (rank === 'Immortal') rankClass = 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30';
+        const rankClass = getRankClass(rank);
+        const statusHtml = user.disabled
+            ? '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-semibold border border-red-500/30">Disabled</span>'
+            : '<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-semibold border border-green-500/30">Active</span>';
 
         return `
         <tr class="hover:bg-brand-light/30 transition-colors group">
@@ -212,31 +229,78 @@ const renderTable = () => {
             <td class="p-4 text-sm font-bold">
                 <span class="px-2 py-1 rounded text-xs ${rankClass}">${rank}</span>
             </td>
-            <td class="p-4 text-sm">
-                ${user.disabled
-                ? '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-semibold border border-red-500/30">Disabled</span>'
-                : '<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-semibold border border-green-500/30">Active</span>'
-            }
-            </td>
+            <td class="p-4 text-sm">${statusHtml}</td>
             <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.creationTime)}</td>
             <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.lastSignInTime)}</td>
             <td class="p-4">
-                <div class="flex flex-col sm:flex-row items-end sm:items-center justify-end gap-3 sm:gap-4">
+                <div class="flex items-center justify-end gap-3">
                     <button onclick="toggleDisableStatus('${user.uid}', ${!!user.disabled})" class="relative inline-flex shrink-0 items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${user.disabled ? 'bg-red-500' : 'bg-green-500'}" title="${user.disabled ? 'Enable User' : 'Disable User'}">
                         <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
                     </button>
                     <div class="flex gap-2 shrink-0">
                         <button onclick="openEditModal('${user.uid}', '${displayName}', '${rank}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
-                            <i class="ri-edit-line z-10 relative"></i>
+                            <i class="ri-edit-line"></i>
                         </button>
                         <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/20 transition-colors" title="Delete User">
-                            <i class="ri-delete-bin-line z-10 relative"></i>
+                            <i class="ri-delete-bin-line"></i>
                         </button>
                     </div>
                 </div>
             </td>
-        </tr>
-    `}).join('');
+        </tr>`;
+    }).join('');
+
+    // ── Mobile cards ──
+    usersCardsContainer.innerHTML = usersList.map(user => {
+        const displayName = user.displayName || 'Unknown';
+        const imgName = user.displayName || 'MHF_Steve';
+        const rank = (user.customClaims && user.customClaims.rank) ? user.customClaims.rank : 'Member';
+        const rankClass = getRankClass(rank);
+        const statusHtml = user.disabled
+            ? '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-semibold border border-red-500/30">Disabled</span>'
+            : '<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-semibold border border-green-500/30">Active</span>';
+
+        return `
+        <div class="user-card p-4 bg-brand-dark border-b border-brand-border last:border-b-0">
+            <!-- Top row: avatar + name + actions -->
+            <div class="flex items-center justify-between gap-3 mb-3">
+                <div class="flex items-center gap-3 min-w-0">
+                    <img src="https://mc-heads.net/avatar/${imgName}/48" class="w-12 h-12 rounded-lg border border-brand-border shrink-0" style="image-rendering: pixelated;" onerror="this.src='${defaultSkinUrl}'">
+                    <div class="min-w-0">
+                        <p class="font-bold text-white text-base truncate">${displayName}</p>
+                        <p class="text-[10px] text-brand-text font-mono truncate">${user.email}</p>
+                    </div>
+                </div>
+                <!-- Action buttons (always visible on mobile) -->
+                <div class="flex items-center gap-1 shrink-0">
+                    <button onclick="openEditModal('${user.uid}', '${displayName}', '${rank}')" class="text-brand-blue hover:text-white p-2 rounded-lg hover:bg-brand-blue/20 transition-colors" title="Edit">
+                        <i class="ri-edit-line text-lg"></i>
+                    </button>
+                    <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded-lg hover:bg-red-500/20 transition-colors" title="Delete">
+                        <i class="ri-delete-bin-line text-lg"></i>
+                    </button>
+                </div>
+            </div>
+            <!-- Info pills row -->
+            <div class="flex flex-wrap items-center gap-2 mb-3">
+                <span class="px-2 py-0.5 rounded text-xs font-semibold ${rankClass}">${rank}</span>
+                ${statusHtml}
+            </div>
+            <!-- Dates + toggle row -->
+            <div class="flex items-center justify-between gap-2 text-xs text-brand-text">
+                <div class="flex flex-col gap-0.5">
+                    <span><i class="ri-calendar-line mr-1"></i>Joined: ${formatDate(user.metadata?.creationTime)}</span>
+                    <span><i class="ri-time-line mr-1"></i>Last login: ${formatDate(user.metadata?.lastSignInTime)}</span>
+                </div>
+                <!-- Disable/Enable toggle -->
+                <button onclick="toggleDisableStatus('${user.uid}', ${!!user.disabled})" 
+                    class="relative inline-flex shrink-0 items-center h-7 rounded-full w-12 transition-colors focus:outline-none ${user.disabled ? 'bg-red-500' : 'bg-green-500'}" 
+                    title="${user.disabled ? 'Enable User' : 'Disable User'}">
+                    <span class="inline-block w-5 h-5 transform bg-white rounded-full transition-transform shadow ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
+                </button>
+            </div>
+        </div>`;
+    }).join('');
 };
 
 // --- Actions ---
