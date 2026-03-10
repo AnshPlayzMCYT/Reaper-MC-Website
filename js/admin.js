@@ -380,55 +380,101 @@ window.openEditModal = (uid, currentUsername, currentRank) => {
     const rankOptions = ranks.map(r => `<option value="${r}" ${r === currentRank ? 'selected' : ''}>${r}</option>`).join('');
 
     const modalHtml = `
-        <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-            <div class="bg-brand-light border border-brand-border rounded-xl shadow-2xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh]">
-                
-                <div class="p-6 border-b border-brand-border flex justify-between items-center bg-brand-dark">
-                    <h3 class="text-xl font-bold text-white">Edit User</h3>
-                    <button onclick="closeModal('edit-modal')" class="text-brand-text hover:text-white transition-colors">
-                        <i class="ri-close-line text-2xl"></i>
+        <div id="edit-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[100] p-0 sm:p-4">
+            <div class="bg-brand-light border border-brand-border sm:rounded-xl shadow-2xl w-full sm:max-w-lg overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] rounded-t-2xl">
+
+                <!-- Sticky Header -->
+                <div class="p-4 sm:p-5 border-b border-brand-border flex justify-between items-center bg-brand-dark shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-brand-blue/10 border border-brand-blue/30 p-2 rounded-lg">
+                            <i class="ri-user-settings-line text-brand-blue text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-white leading-tight">Edit User</h3>
+                            <p class="text-xs text-brand-text font-mono truncate max-w-[160px] sm:max-w-xs">${currentUsername}</p>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('edit-modal')"
+                        class="text-brand-text hover:text-white hover:bg-brand-border transition-all p-2 rounded-lg shrink-0">
+                        <i class="ri-close-line text-xl"></i>
                     </button>
                 </div>
 
-                <div class="p-6 space-y-6 overflow-y-auto">
-                    <!-- Update Username Form -->
-                    <div class="bg-brand-darkest p-4 rounded-lg border border-brand-border">
-                        <h4 class="font-semibold text-white mb-3 text-sm">Change Minecraft Username</h4>
-                        <div class="flex gap-2">
-                            <input type="text" id="edit-username-input" value="${currentUsername === 'Unknown' ? '' : currentUsername}" placeholder="New Username" 
-                                class="flex-grow bg-brand-dark border border-brand-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-blue">
-                            <button onclick="updateUsername('${uid}')" class="bg-brand-blue hover:bg-brand-blue/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-                                Update
+                <!-- Scrollable body -->
+                <div class="p-4 sm:p-5 space-y-4 overflow-y-auto">
+
+                    <!-- Change Username -->
+                    <div class="bg-brand-darkest p-4 rounded-xl border border-brand-border">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="ri-edit-box-line text-brand-blue text-base"></i>
+                            <h4 class="font-semibold text-white text-sm">Change Minecraft Username</h4>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input
+                                type="text"
+                                id="edit-username-input"
+                                value="${currentUsername === 'Unknown' ? '' : currentUsername}"
+                                placeholder="Enter new username"
+                                class="w-full sm:flex-grow bg-brand-dark border border-brand-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-brand-blue placeholder:text-brand-text/50 transition-colors">
+                            <button onclick="updateUsername('${uid}')"
+                                class="w-full sm:w-auto bg-brand-blue hover:bg-brand-blue/80 active:scale-95 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap">
+                                <i class="ri-check-line mr-1"></i> Update
                             </button>
                         </div>
                     </div>
 
-                    <!-- Update Rank Form -->
-                    <div class="bg-brand-darkest p-4 rounded-lg border border-brand-border">
-                        <h4 class="font-semibold text-white mb-3 text-sm">Change Rank</h4>
-                        <div class="flex gap-2">
-                            <select id="edit-rank-input" class="flex-grow bg-brand-dark border border-brand-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-blue font-semibold">
+                    <!-- Change Rank -->
+                    <div class="bg-brand-darkest p-4 rounded-xl border border-brand-border">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="ri-medal-line text-orange-400 text-base"></i>
+                            <h4 class="font-semibold text-white text-sm">Change Rank</h4>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <select
+                                id="edit-rank-input"
+                                class="w-full sm:flex-grow bg-brand-dark border border-brand-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-brand-blue font-semibold transition-colors cursor-pointer">
                                 ${rankOptions}
                             </select>
-                            <button onclick="updateRank('${uid}')" class="bg-orange-500 hover:bg-orange-500/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-                                Update
+                            <button onclick="updateRank('${uid}')"
+                                class="w-full sm:w-auto bg-orange-500 hover:bg-orange-500/80 active:scale-95 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap">
+                                <i class="ri-check-line mr-1"></i> Update
                             </button>
                         </div>
                     </div>
 
-                    <!-- Update Password Form -->
-                    <div class="bg-brand-darkest p-4 rounded-lg border border-brand-border">
-                        <h4 class="font-semibold text-white mb-3 text-sm">Change Password</h4>
-                        <div class="flex gap-2">
-                            <input type="password" id="edit-password-input" placeholder="New Password (min 6 chars)" 
-                                class="flex-grow bg-brand-dark border border-brand-border rounded-lg py-2 px-3 text-white text-sm focus:outline-none focus:border-brand-blue">
-                            <button onclick="updatePassword('${uid}')" class="bg-secondary hover:bg-secondary/80 text-white px-4 py-2 rounded-lg text-sm font-semibold transition-colors">
-                                Update
+                    <!-- Change Password -->
+                    <div class="bg-brand-darkest p-4 rounded-xl border border-brand-border">
+                        <div class="flex items-center gap-2 mb-3">
+                            <i class="ri-lock-password-line text-secondary text-base"></i>
+                            <h4 class="font-semibold text-white text-sm">Change Password</h4>
+                        </div>
+                        <div class="flex flex-col sm:flex-row gap-2">
+                            <input
+                                type="password"
+                                id="edit-password-input"
+                                placeholder="New password (min 6 chars)"
+                                class="w-full sm:flex-grow bg-brand-dark border border-brand-border rounded-lg py-2.5 px-3 text-white text-sm focus:outline-none focus:border-brand-blue placeholder:text-brand-text/50 transition-colors">
+                            <button onclick="updatePassword('${uid}')"
+                                class="w-full sm:w-auto bg-secondary hover:bg-secondary/80 active:scale-95 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-all whitespace-nowrap">
+                                <i class="ri-check-line mr-1"></i> Update
                             </button>
                         </div>
-                        <p class="text-xs text-brand-text mt-2"><i class="ri-information-line"></i> This will immediately log the user out everywhere.</p>
+                        <p class="text-xs text-brand-text/70 mt-2.5 flex items-center gap-1.5">
+                            <i class="ri-information-line text-brand-blue"></i>
+                            This will immediately log the user out of all devices.
+                        </p>
                     </div>
+
                 </div>
+
+                <!-- Sticky footer close (mobile only) -->
+                <div class="p-4 border-t border-brand-border bg-brand-dark shrink-0 sm:hidden">
+                    <button onclick="closeModal('edit-modal')"
+                        class="w-full bg-brand-light hover:bg-brand-border border border-brand-border text-white py-3 rounded-xl font-semibold text-sm transition-colors">
+                        Close
+                    </button>
+                </div>
+
             </div>
         </div>
     `;
