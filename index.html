@@ -240,6 +240,97 @@
         </div>
     </main>
 
+    <!-- ════════════════════════════════════════
+         SERVER STATUS WIDGET
+    ════════════════════════════════════════ -->
+    <section class="py-10 bg-brand-darkest">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6">
+
+            <div id="server-widget"
+                class="relative bg-brand-dark border border-brand-border rounded-2xl shadow-2xl overflow-hidden">
+
+                <!-- Decorative top glow bar (changes color dynamically) -->
+                <div id="widget-glow-bar" class="h-1 w-full bg-gradient-to-r from-green-500 via-green-400 to-emerald-500 transition-all duration-700"></div>
+
+                <div class="p-5 sm:p-7">
+                    <!-- Header row -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-brand-light p-2 rounded-lg border border-brand-border">
+                                <i class="ri-server-line text-brand-blue text-2xl"></i>
+                            </div>
+                            <div>
+                                <h2 class="text-white font-black text-lg sm:text-xl leading-tight">Reaper MC</h2>
+                                <p class="text-brand-text text-xs sm:text-sm font-mono">play.reapermc.in</p>
+                            </div>
+                        </div>
+                        <!-- Status badge -->
+                        <div id="server-status-badge"
+                            class="flex items-center gap-2 bg-brand-light border border-brand-border rounded-full px-4 py-1.5 w-fit">
+                            <span id="status-dot" class="inline-block w-2.5 h-2.5 rounded-full bg-gray-400 animate-pulse"></span>
+                            <span id="status-text" class="text-sm font-bold text-gray-400">Checking…</span>
+                        </div>
+                    </div>
+
+                    <!-- Stats grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
+
+                        <!-- Online Players -->
+                        <div class="bg-brand-light/60 border border-brand-border rounded-xl p-4 flex items-center gap-3">
+                            <div class="bg-green-500/10 p-2.5 rounded-lg border border-green-500/20 shrink-0">
+                                <i class="ri-user-line text-green-400 text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-brand-text font-semibold uppercase tracking-wider">Online Players</p>
+                                <p id="player-count" class="text-2xl font-black text-white">—</p>
+                            </div>
+                        </div>
+
+                        <!-- Max Capacity -->
+                        <div class="bg-brand-light/60 border border-brand-border rounded-xl p-4 flex items-center gap-3">
+                            <div class="bg-brand-blue/10 p-2.5 rounded-lg border border-brand-blue/20 shrink-0">
+                                <i class="ri-group-line text-brand-blue text-xl"></i>
+                            </div>
+                            <div>
+                                <p class="text-xs text-brand-text font-semibold uppercase tracking-wider">Max Capacity</p>
+                                <p id="max-players" class="text-2xl font-black text-white">—</p>
+                            </div>
+                        </div>
+
+                        <!-- Slots filled bar -->
+                        <div class="bg-brand-light/60 border border-brand-border rounded-xl p-4">
+                            <p class="text-xs text-brand-text font-semibold uppercase tracking-wider mb-2">Capacity Used</p>
+                            <div class="w-full bg-brand-border rounded-full h-3 overflow-hidden mb-1">
+                                <div id="capacity-bar"
+                                    class="h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-700"
+                                    style="width:0%"></div>
+                            </div>
+                            <p id="capacity-label" class="text-xs text-brand-text text-right">0 / 0</p>
+                        </div>
+
+                    </div>
+
+                    <!-- Bottom row: Copy IP + refresh info -->
+                    <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+
+                        <button id="widget-copy-ip"
+                            class="flex items-center justify-center gap-2 bg-brand-blue hover:bg-brand-blue/80 active:scale-95 text-white font-bold px-6 py-3 rounded-xl transition-all duration-200 shadow-lg shadow-brand-blue/20 flex-1 sm:flex-none">
+                            <i class="ri-clipboard-line text-lg"></i>
+                            <span id="widget-copy-text">Click to Copy IP</span>
+                        </button>
+
+                        <p class="text-xs text-brand-text/50 text-center sm:text-left sm:ml-2">
+                            <i class="ri-refresh-line mr-1"></i>Auto-refreshes every 60s
+                            &nbsp;·&nbsp;
+                            <span id="last-updated">—</span>
+                        </p>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <!-- YOUR ORIGINAL RANKS/STORE SECTION -->
     <section id="ranks" class="py-20 bg-brand-dark">
         <div class="max-w-7xl mx-auto px-6">
@@ -682,6 +773,107 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
+            // ─────────────────────────────────────────
+            // SERVER STATUS WIDGET
+            // ─────────────────────────────────────────
+            const SERVER_IP = 'play.reapermc.in';
+            const REFRESH_INTERVAL_MS = 60000; // 60 seconds
+
+            const elDot       = document.getElementById('status-dot');
+            const elText      = document.getElementById('status-text');
+            const elPlayers   = document.getElementById('player-count');
+            const elMax       = document.getElementById('max-players');
+            const elBar       = document.getElementById('capacity-bar');
+            const elBarLabel  = document.getElementById('capacity-label');
+            const elGlowBar   = document.getElementById('widget-glow-bar');
+            const elLastUpd   = document.getElementById('last-updated');
+            const elCopyBtn   = document.getElementById('widget-copy-ip');
+            const elCopyText  = document.getElementById('widget-copy-text');
+
+            const setOnline = (online, maxP) => {
+                if (online === null) {
+                    // Unknown / loading
+                    elDot.className  = 'inline-block w-2.5 h-2.5 rounded-full bg-gray-400 animate-pulse';
+                    elText.className = 'text-sm font-bold text-gray-400';
+                    elText.textContent = 'Checking…';
+                    elGlowBar.className = 'h-1 w-full bg-gradient-to-r from-gray-600 to-gray-500 transition-all duration-700';
+                    return;
+                }
+                if (online < 0) {
+                    // Offline
+                    elDot.className  = 'inline-block w-2.5 h-2.5 rounded-full bg-red-500';
+                    elText.className = 'text-sm font-bold text-red-400';
+                    elText.textContent = 'Offline';
+                    elGlowBar.className = 'h-1 w-full bg-gradient-to-r from-red-600 to-red-400 transition-all duration-700';
+                } else {
+                    // Online
+                    elDot.className  = 'inline-block w-2.5 h-2.5 rounded-full bg-green-400 animate-pulse';
+                    elText.className = 'text-sm font-bold text-green-400';
+                    elText.textContent = 'Online';
+                    elGlowBar.className = 'h-1 w-full bg-gradient-to-r from-green-500 via-green-400 to-emerald-500 transition-all duration-700';
+                }
+
+                // Player count
+                elPlayers.textContent = online >= 0 ? online.toLocaleString() : '—';
+                elMax.textContent     = maxP  >   0 ? maxP.toLocaleString()  : '—';
+
+                // Capacity bar
+                const pct = (maxP > 0 && online >= 0) ? Math.min(100, (online / maxP) * 100) : 0;
+                elBar.style.width   = pct + '%';
+                // Bar colour: green < 60%, yellow 60-85%, red > 85%
+                if (pct > 85) {
+                    elBar.className = 'h-full bg-gradient-to-r from-red-500 to-red-400 rounded-full transition-all duration-700';
+                } else if (pct > 60) {
+                    elBar.className = 'h-full bg-gradient-to-r from-yellow-500 to-amber-400 rounded-full transition-all duration-700';
+                } else {
+                    elBar.className = 'h-full bg-gradient-to-r from-green-500 to-emerald-400 rounded-full transition-all duration-700';
+                }
+                elBarLabel.textContent = (online >= 0 && maxP > 0) ? `${online.toLocaleString()} / ${maxP.toLocaleString()}` : '— / —';
+            };
+
+            const fetchServerStatus = async () => {
+                try {
+                    const res  = await fetch(`https://api.mcsrvstat.us/3/${SERVER_IP}`);
+                    const data = await res.json();
+                    if (data.online) {
+                        const current = data.players?.online ?? 0;
+                        const max     = data.players?.max    ?? 0;
+                        setOnline(current, max);
+                    } else {
+                        setOnline(-1, 0);
+                    }
+                } catch (e) {
+                    setOnline(-1, 0);
+                }
+                // Update timestamp
+                const now = new Date();
+                elLastUpd.textContent = 'Updated ' + now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            };
+
+            fetchServerStatus();
+            setInterval(fetchServerStatus, REFRESH_INTERVAL_MS);
+
+            // Copy IP button inside widget
+            if (elCopyBtn) {
+                elCopyBtn.addEventListener('click', () => {
+                    navigator.clipboard.writeText(SERVER_IP).catch(() => {
+                        const ta = document.createElement('textarea');
+                        ta.value = SERVER_IP; ta.style.position='fixed'; ta.style.opacity='0';
+                        document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+                        document.body.removeChild(ta);
+                    });
+                    elCopyText.textContent = 'Copied!';
+                    elCopyBtn.classList.add('bg-green-500', 'shadow-green-500/30');
+                    elCopyBtn.classList.remove('bg-brand-blue', 'shadow-brand-blue/20');
+                    setTimeout(() => {
+                        elCopyText.textContent = 'Click to Copy IP';
+                        elCopyBtn.classList.remove('bg-green-500', 'shadow-green-500/30');
+                        elCopyBtn.classList.add('bg-brand-blue', 'shadow-brand-blue/20');
+                    }, 2000);
+                });
+            }
+            // ─────────────────────────────────────────
             // --- IP Copy Functionality ---
             const copyFeedback = document.getElementById('copyFeedback');
             const setupCopyButton = (buttonId) => {
