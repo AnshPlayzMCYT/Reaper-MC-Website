@@ -21,6 +21,12 @@ const renderLoginUI = async (user) => {
             else if (rank === 'MVP+') rankClass += 'bg-blue-500/20 text-blue-500 border border-blue-500/30';
             else if (rank === 'Legend') rankClass += 'bg-orange-500/20 text-orange-400 border border-orange-500/30';
             else if (rank === 'Immortal') rankClass += 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30';
+            else if (rank === 'Owner') rankClass += 'bg-red-600/20 text-red-500 border border-red-600/30';
+            else if (rank === 'Admin') rankClass += 'bg-red-500/20 text-red-400 border border-red-500/30';
+            else if (rank === 'Mod') rankClass += 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+            else if (rank === 'Famous') rankClass += 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30';
+            else if (rank === 'Media') rankClass += 'bg-purple-500/20 text-purple-400 border border-purple-500/30';
+            else rankClass += 'bg-brand-border text-brand-text'; // fallback
             
             rankBadgeHtml = `<span class="${rankClass}">${rank}</span>`;
         }

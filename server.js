@@ -188,7 +188,7 @@ app.post('/api/users/:uid/rank', verifyToken, async (req, res) => {
     const { uid } = req.params;
     const { rank } = req.body;
 
-    const validRanks = ['Member', 'VIP', 'VIP+', 'MVP', 'MVP+', 'Legend', 'Immortal'];
+    const validRanks = ['Member', 'VIP', 'VIP+', 'MVP', 'MVP+', 'Legend', 'Immortal', 'Owner', 'Admin', 'Mod', 'Famous', 'Media'];
     if (rank && !validRanks.includes(rank)) {
         return res.status(400).json({ error: 'Invalid rank format.' });
     }
@@ -209,6 +209,30 @@ app.post('/api/users/:uid/rank', verifyToken, async (req, res) => {
         res.status(200).json({ message: 'Rank updated successfully' });
     } catch (error) {
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Check if username is taken (Case-insensitive)
+app.get('/api/check-username/:username', async (req, res) => {
+    const requestedUsername = req.params.username.toLowerCase();
+    
+    try {
+        // We have to iterate through all users to check displayName (Firebase Auth doesn't have a direct query for this)
+        // For a very large userbase, this isn't optimal and would require a separate database (like Firestore),
+        // but it works for a smaller scale server.
+        const listUsersResult = await admin.auth().listUsers(1000);
+        
+        const isTaken = listUsersResult.users.some(userRecord => {
+            if (userRecord.displayName) {
+                return userRecord.displayName.toLowerCase() === requestedUsername;
+            }
+            return false;
+        });
+
+        res.status(200).json({ taken: isTaken });
+    } catch (error) {
+        console.error('Error checking username:', error);
+        res.status(500).json({ error: 'Failed to verify username uniqueness.' });
     }
 });
 

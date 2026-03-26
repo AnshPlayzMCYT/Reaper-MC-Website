@@ -4,6 +4,7 @@ import {
     signInWithEmailAndPassword,
     updateProfile,
     GoogleAuthProvider,
+    OAuthProvider,
     signInWithPopup,
     sendPasswordResetEmail,
     getAdditionalUserInfo
@@ -15,6 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginForm = document.getElementById('login-form');
     const forgotPasswordForm = document.getElementById('forgot-password-form');
     const googleBtn = document.getElementById('google-login-btn');
+    const discordBtn = document.getElementById('discord-login-btn');
     const errorBox = document.getElementById('auth-error');
     const successBox = document.getElementById('auth-success');
 
@@ -59,6 +61,25 @@ document.addEventListener('DOMContentLoaded', () => {
             if (spinner) spinner.classList.add('hidden');
             btn.disabled = false;
             btn.classList.remove('opacity-75');
+        }
+    };
+
+    const checkUsernameAvailability = async (username) => {
+        try {
+            const API_URL = window.location.origin.includes('localhost') ? 'http://localhost:3000/api' : `${window.location.origin}/api`;
+            const response = await fetch(`${API_URL}/check-username/${encodeURIComponent(username)}`);
+            if (!response.ok) {
+                console.error("Failed to check username availability", response.status);
+                // Fail open or closed? Failing open is usually better if the server is just down temporarily,
+                // but for strict uniqueness, we should probably fail closed.
+                // For now, let's return false (not taken) if the API fails, to avoid bricking signups.
+                return false; 
+            }
+            const data = await response.json();
+            return data.taken;
+        } catch (error) {
+            console.error("Error connecting to check-username endpoint", error);
+            return false;
         }
     };
 
@@ -132,7 +153,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
+            // Check lengths
+            if (username.length < 3 || username.length > 16) {
+                 showModalError("Username must be between 3 and 16 characters.");
+                 return;
+            }
+
             toggleModalLoading(true);
+
+            // Check if username is taken
+            const isTaken = await checkUsernameAvailability(username);
+            if (isTaken) {
+                toggleModalLoading(false);
+                showModalError("This username is already taken. Please choose another one.");
+                return;
+            }
+
             try {
                 await updateProfile(user, {
                     displayName: username
@@ -164,6 +200,29 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             } catch (error) {
                 console.error("Google Auth Error:", error);
+                showError(error.message);
+            }
+        });
+    }
+
+    // --- Discord Auth ---
+    if (discordBtn) {
+        discordBtn.addEventListener('click', async () => {
+            hideError();
+            hideSuccess();
+            const provider = new OAuthProvider('oidc.reapermc-discord');
+            provider.addScope('email');
+            try {
+                const userCredential = await signInWithPopup(auth, provider);
+                const additionalUserInfo = getAdditionalUserInfo(userCredential);
+
+                if (additionalUserInfo && additionalUserInfo.isNewUser) {
+                    showMinecraftUsernamePrompt(userCredential.user);
+                } else {
+                    window.location.href = 'index.html';
+                }
+            } catch (error) {
+                console.error("Discord Auth Error:", error);
                 showError(error.message);
             }
         });
@@ -208,14 +267,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const email = document.getElementById('email').value;
             const password = document.getElementById('password').value;
-            const mcUsername = document.getElementById('mc-username').value;
+            const mcUsername = document.getElementById('mc-username').value.trim();
 
             if (!mcUsername) {
                 showError("Minecraft Username is required.");
                 return;
             }
 
+            if (mcUsername.length < 3 || mcUsername.length > 16) {
+                showError("Username must be between 3 and 16 characters.");
+                return;
+            }
+
             toggleLoading('signup-btn', true);
+
+            // Check if username is taken
+            const isTaken = await checkUsernameAvailability(mcUsername);
+            if (isTaken) {
+                toggleLoading('signup-btn', false);
+                showError("This username is already taken. Please choose another one.");
+                return;
+            }
+
             try {
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 // Update the user's profile to store their Minecraft Username as their display name

@@ -4,10 +4,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#050f18">
     <title>Reaper MC | Admin Panel</title>
+    <link rel="icon" type="image/png" href="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png">
     <script src="https://cdn.tailwindcss.com/3.4.16"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.2.0/remixicon.min.css">
 
     <script>
@@ -17,12 +18,12 @@
                     fontFamily: { sans: ['Poppins', 'sans-serif'] },
                     colors: {
                         'brand-darkest': '#050f18',
-                        'brand-dark': '#0d1f2e',
-                        'brand-light': '#142a3d',
-                        'brand-border': '#1d3449',
-                        'brand-text': '#99aec2',
-                        'brand-blue': '#008bff',
-                        secondary: '#8b5cf6',
+                        'brand-dark':    '#0d1f2e',
+                        'brand-light':   '#142a3d',
+                        'brand-border':  '#1d3449',
+                        'brand-text':    '#99aec2',
+                        'brand-blue':    '#008bff',
+                        secondary:       '#8b5cf6',
                     }
                 }
             }
@@ -30,7 +31,49 @@
     </script>
 
     <style>
-        /* Hide table on mobile, show cards; flip on md+ */
+        *, *::before, *::after { box-sizing: border-box; }
+
+        html, body {
+            font-family: 'Poppins', sans-serif;
+            background: #050f18;
+            color: #99aec2;
+            min-height: 100vh;
+            margin: 0; padding: 0;
+        }
+
+        /* subtle background glow - kept very light and pointer-events:none */
+        .bg-glow {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 0;
+            background:
+                radial-gradient(ellipse 60% 40% at 8% 18%, rgba(0,139,255,0.06) 0%, transparent 100%),
+                radial-gradient(ellipse 50% 40% at 92% 82%, rgba(139,92,246,0.05) 0%, transparent 100%);
+        }
+
+        /* All main content sits above the bg glow */
+        #root { position: relative; z-index: 1; }
+
+        /* Card styles - solid, no backdrop-filter to avoid rendering issues */
+        .card {
+            background: #0d1f2e;
+            border: 1px solid #1d3449;
+            border-radius: 16px;
+        }
+
+        /* Stat card hover lift */
+        .stat-card {
+            transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+            cursor: default;
+        }
+        .stat-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 36px rgba(0,139,255,0.11);
+            border-color: rgba(0,139,255,0.3);
+        }
+
+        /* Responsive table / cards */
         @media (max-width: 767px) {
             .desktop-table { display: none !important; }
             .mobile-cards  { display: block !important; }
@@ -40,123 +83,238 @@
             .mobile-cards  { display: none !important; }
         }
 
-        /* Subtle card hover lift */
-        .user-card {
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-        }
+        /* Table row hover */
+        .user-row { transition: background 0.15s ease; }
+        .user-row:hover { background: rgba(0,139,255,0.05); }
+
+        /* Mobile user card */
+        .user-card { transition: transform 0.18s ease, box-shadow 0.18s ease; }
         .user-card:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 32px 0 rgba(0,139,255,0.10);
+            box-shadow: 0 6px 24px rgba(0,139,255,0.09);
+        }
+
+        /* Row slide-in animation */
+        @keyframes rowIn {
+            from { opacity: 0; transform: translateX(-6px); }
+            to   { opacity: 1; transform: translateX(0); }
+        }
+        .row-animate { animation: rowIn 0.28s ease-out forwards; }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: #050f18; }
+        ::-webkit-scrollbar-thumb { background: #1d3449; border-radius: 99px; }
+        ::-webkit-scrollbar-thumb:hover { background: #008bff; }
+
+        /* Search input focus ring */
+        #user-search-input:focus {
+            outline: none;
+            border-color: #008bff;
+            box-shadow: 0 0 0 3px rgba(0,139,255,0.14);
+        }
+
+        /* Live-players button pulse — contained, no overflow */
+        @keyframes pulseScale {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(34,197,94,0.4); }
+            50%       { box-shadow: 0 0 0 8px rgba(34,197,94,0); }
+        }
+        .btn-pulse { animation: pulseScale 2s ease-in-out infinite; }
+
+        /* Fade in for header */
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .anim-header { animation: fadeInDown 0.4s ease-out both; }
+
+        /* Slide up for cards */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(14px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+        .anim-card-1 { animation: slideUp 0.4s 0.08s ease-out both; }
+        .anim-card-2 { animation: slideUp 0.4s 0.16s ease-out both; }
+        .anim-section { animation: slideUp 0.4s 0.24s ease-out both; }
+
+        /* Page loader */
+        #page-loader { transition: opacity 0.45s ease; }
+        @keyframes loaderLine {
+            0%   { width: 0%;   opacity: 1; }
+            65%  { width: 85%;  opacity: 1; }
+            100% { width: 100%; opacity: 0; }
+        }
+        #loader-line { animation: loaderLine 1.7s ease-in-out infinite; }
+
+        /* Green dot status indicator */
+        .status-dot {
+            width: 9px; height: 9px;
+            background: #4ade80;
+            border-radius: 50%;
+            border: 2px solid #050f18;
+            position: absolute;
+            bottom: 0; right: 0;
         }
     </style>
 </head>
 
-<body class="bg-brand-darkest text-brand-text min-h-screen p-3 sm:p-6 lg:p-8">
+<body>
 
-    <!-- Global Page Loader -->
-    <div id="page-loader"
-        class="fixed inset-0 z-[9999] bg-brand-dark flex flex-col items-center justify-center transition-opacity duration-500">
-        <i class="ri-loader-4-line text-5xl text-brand-blue animate-spin mb-4 drop-shadow-2xl"></i>
+    <!-- Background glow (purely decorative) -->
+    <div class="bg-glow"></div>
+
+    <!-- ── Page Loader ── -->
+    <div id="page-loader" class="fixed inset-0 z-[9999] bg-brand-darkest flex flex-col items-center justify-center">
+        <div class="relative mb-5 w-16 h-16">
+            <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                alt="Loading" class="w-16 h-16 drop-shadow-xl animate-pulse relative z-10">
+        </div>
+        <div class="w-44 h-[3px] bg-brand-dark rounded-full overflow-hidden">
+            <div id="loader-line" class="h-full bg-gradient-to-r from-brand-blue to-secondary rounded-full"></div>
+        </div>
+        <p class="text-brand-text/50 text-[11px] mt-3 font-semibold tracking-[0.2em] uppercase">Loading Dashboard</p>
     </div>
 
-    <!-- Modals Container -->
+    <!-- ── Modals Container ── -->
     <div id="modals"></div>
 
-    <div class="max-w-7xl mx-auto">
+    <!-- ── Main Layout ── -->
+    <div id="root" class="max-w-7xl mx-auto px-3 sm:px-5 lg:px-8 py-4 sm:py-6 lg:py-8">
 
-        <!-- ── Header ── -->
-        <header class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 lg:mb-8 bg-brand-dark border border-brand-border p-4 sm:p-6 rounded-xl shadow-lg">
-            <div class="flex items-center gap-3 sm:gap-4">
-                <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
-                    alt="Logo" class="w-10 h-10 sm:w-12 sm:h-12 shrink-0">
+        <!-- Header -->
+        <header class="card anim-header p-4 sm:p-5 mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <div class="relative shrink-0">
+                    <img src="https://static.readdy.ai/image/77fb13bf09ca7e6cd3a010ee816e6478/b15e1ab27f31f6972fd10171fc3fdcd7.png"
+                        alt="Logo" class="w-10 h-10 rounded-xl">
+                    <span class="status-dot"></span>
+                </div>
                 <div>
-                    <h1 class="text-xl sm:text-2xl font-black text-white leading-tight">Admin Dashboard</h1>
-                    <p class="text-xs sm:text-sm">Manage users and store content</p>
+                    <h1 class="text-lg sm:text-xl font-black text-white leading-tight">Admin Dashboard</h1>
+                    <p class="text-[11px] sm:text-xs text-brand-text/60">Manage users and server content</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2 sm:gap-3 w-full sm:w-auto">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
                 <a href="/"
-                    class="flex items-center justify-center gap-2 bg-brand-light hover:bg-brand-border text-white px-3 sm:px-4 py-2 rounded-lg transition-colors text-sm font-semibold border border-brand-border flex-1 sm:flex-none">
-                    <i class="ri-home-4-line text-base sm:text-lg"></i>
+                    class="flex items-center justify-center gap-1.5 bg-brand-dark hover:bg-brand-light text-white px-3.5 py-2 rounded-xl transition-all text-sm font-semibold border border-brand-border hover:border-brand-blue/40 flex-1 sm:flex-none active:scale-95">
+                    <i class="ri-home-4-line text-sm"></i>
                     <span>Store</span>
                 </a>
                 <button id="admin-logout-btn"
-                    class="flex items-center justify-center gap-2 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-500 border border-red-500/50 px-3 sm:px-4 py-2 rounded-lg transition-all text-sm font-semibold flex-1 sm:flex-none">
-                    <i class="ri-logout-box-r-line text-base sm:text-lg"></i>
+                    class="flex items-center justify-center gap-1.5 bg-red-500/10 hover:bg-red-500 hover:text-white text-red-400 border border-red-500/40 px-3.5 py-2 rounded-xl transition-all text-sm font-semibold flex-1 sm:flex-none active:scale-95">
+                    <i class="ri-logout-box-r-line text-sm"></i>
                     <span>Logout</span>
                 </button>
             </div>
         </header>
 
-        <!-- ── Stats row ── -->
-        <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 lg:mb-8">
-            <div class="bg-brand-light border border-brand-border rounded-xl p-4 sm:p-6 shadow-md">
-                <div class="flex items-center justify-between">
-                    <div>
-                        <p class="text-xs sm:text-sm font-semibold mb-1 text-brand-text">Total Users</p>
-                        <p class="text-2xl sm:text-3xl font-black text-white" id="stat-total-users">-</p>
+        <!-- Stats Row -->
+        <div class="grid grid-cols-2 gap-3 sm:gap-4 mb-5">
+
+            <!-- Total Users -->
+            <div class="stat-card card anim-card-1 p-4 sm:p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-semibold text-brand-text/60 mb-1 uppercase tracking-wider truncate">Total Users</p>
+                        <p class="text-3xl sm:text-4xl font-black text-white" id="stat-total-users">–</p>
                     </div>
-                    <div class="bg-brand-darkest p-2 sm:p-3 rounded-lg text-brand-blue">
-                        <i class="ri-group-line text-xl sm:text-2xl"></i>
+                    <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-brand-blue/10 border border-brand-blue/20 flex items-center justify-center shrink-0">
+                        <i class="ri-group-line text-brand-blue text-xl sm:text-2xl"></i>
                     </div>
+                </div>
+            </div>
+
+            <!-- Online In-Game -->
+            <div class="stat-card card anim-card-2 p-4 sm:p-5">
+                <div class="flex items-center justify-between gap-3">
+                    <div class="min-w-0">
+                        <p class="text-[10px] sm:text-xs font-semibold text-brand-text/60 mb-1 uppercase tracking-wider truncate">Online In-Game</p>
+                        <p class="text-3xl sm:text-4xl font-black text-white" id="stat-online-players">–</p>
+                    </div>
+                    <button id="view-live-players-btn"
+                        class="btn-pulse w-11 h-11 sm:w-12 sm:h-12 rounded-xl bg-green-500 hover:bg-green-400 active:scale-90 flex items-center justify-center transition-all shrink-0"
+                        title="View who is playing">
+                        <i class="ri-vidicon-line text-white text-xl sm:text-2xl"></i>
+                    </button>
                 </div>
             </div>
         </div>
 
-        <!-- ── Notification Banner ── -->
-        <div id="admin-notification" class="hidden rounded-lg p-4 mb-4 sm:mb-6 text-sm font-semibold transition-all"></div>
+        <!-- Notification Banner -->
+        <div id="admin-notification" class="hidden rounded-xl p-4 mb-4 text-sm font-semibold transition-all"></div>
 
-        <!-- ── Users Section ── -->
-        <div class="bg-brand-dark border border-brand-border rounded-xl shadow-lg overflow-hidden">
+        <!-- Users Section -->
+        <div class="card anim-section overflow-hidden">
 
             <!-- Section Header -->
-            <div class="p-4 sm:p-6 border-b border-brand-border flex flex-col sm:flex-row gap-3 sm:gap-4 justify-between items-start sm:items-center bg-brand-light/50">
-                <h2 class="text-lg sm:text-xl font-bold text-white flex items-center gap-2">
-                    <i class="ri-user-settings-line text-brand-blue"></i>
-                    User Management
-                </h2>
-                <button id="refresh-users-btn"
-                    class="flex items-center gap-2 text-brand-text hover:text-white transition-colors bg-brand-darkest px-3 py-2 rounded-lg border border-brand-border hover:border-brand-blue/50 text-sm group w-full sm:w-auto justify-center sm:justify-start">
-                    <i class="ri-refresh-line group-hover:rotate-180 transition-transform duration-500 inline-block"></i>
-                    Refresh
-                </button>
+            <div class="px-4 sm:px-5 pt-4 sm:pt-5 pb-4 border-b border-brand-border/50 flex flex-col gap-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <h2 class="text-base sm:text-lg font-bold text-white flex items-center gap-2 flex-wrap">
+                        <span class="flex items-center justify-center w-7 h-7 rounded-lg bg-brand-blue/10 border border-brand-blue/20 shrink-0">
+                            <i class="ri-user-settings-line text-brand-blue text-xs"></i>
+                        </span>
+                        User Management
+                        <span id="search-results-count" class="text-xs font-normal text-brand-text/50 hidden"></span>
+                    </h2>
+                    <button id="refresh-users-btn"
+                        class="flex items-center gap-2 text-brand-text hover:text-white transition-all bg-brand-darkest/60 px-3.5 py-2 rounded-xl border border-brand-border hover:border-brand-blue/40 text-sm group w-full sm:w-auto justify-center sm:justify-start active:scale-95">
+                        <i class="ri-refresh-line group-hover:rotate-180 transition-transform duration-500 shrink-0"></i>
+                        Refresh
+                    </button>
+                </div>
+
+                <!-- Search Bar -->
+                <div class="relative">
+                    <i class="ri-search-line absolute left-3 top-1/2 -translate-y-1/2 text-brand-text/40 pointer-events-none text-sm"></i>
+                    <input type="text" id="user-search-input"
+                        placeholder="Search by username, email, rank, status, date…"
+                        class="w-full bg-brand-darkest border border-brand-border rounded-xl py-2.5 pl-9 pr-9 text-sm text-white placeholder:text-brand-text/35 transition-all duration-200">
+                    <button id="user-search-clear"
+                        class="absolute right-3 top-1/2 -translate-y-1/2 text-brand-text/35 hover:text-white transition-colors hidden">
+                        <i class="ri-close-circle-line text-base"></i>
+                    </button>
+                </div>
             </div>
 
-            <!-- ── Desktop Table (md+) ── -->
+            <!-- Desktop Table -->
             <div class="desktop-table overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-brand-darkest border-b border-brand-border text-xs uppercase tracking-wider text-brand-text">
-                            <th class="p-4 font-semibold">Player</th>
-                            <th class="p-4 font-semibold">Email</th>
-                            <th class="p-4 font-semibold">Rank</th>
-                            <th class="p-4 font-semibold">Status</th>
-                            <th class="p-4 font-semibold">Joined</th>
-                            <th class="p-4 font-semibold">Last Login</th>
-                            <th class="p-4 font-semibold text-right">Actions</th>
+                        <tr class="bg-brand-darkest/50 border-b border-brand-border/50 text-[11px] uppercase tracking-wider text-brand-text/50">
+                            <th class="px-5 py-3 font-semibold">Player</th>
+                            <th class="px-5 py-3 font-semibold">Email</th>
+                            <th class="px-5 py-3 font-semibold">Rank</th>
+                            <th class="px-5 py-3 font-semibold">Status</th>
+                            <th class="px-5 py-3 font-semibold">Joined</th>
+                            <th class="px-5 py-3 font-semibold">Last Login</th>
+                            <th class="px-5 py-3 font-semibold text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="users-table-body" class="divide-y divide-brand-border">
+                    <tbody id="users-table-body" class="divide-y divide-brand-border/30">
                         <tr>
-                            <td colspan="7" class="p-8 text-center text-brand-text">
-                                <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
-                                <p>Loading users...</p>
+                            <td colspan="7" class="px-5 py-10 text-center">
+                                <div class="flex flex-col items-center gap-2 text-brand-text/40">
+                                    <i class="ri-loader-4-line animate-spin text-2xl text-brand-blue"></i>
+                                    <p class="text-sm">Loading users…</p>
+                                </div>
                             </td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            <!-- ── Mobile Cards (< md) ── -->
-            <div id="users-cards-container" class="mobile-cards divide-y divide-brand-border">
-                <div class="p-8 text-center text-brand-text">
-                    <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
-                    <p>Loading users...</p>
+            <!-- Mobile Cards -->
+            <div id="users-cards-container" class="mobile-cards divide-y divide-brand-border/30">
+                <div class="px-4 py-10 text-center">
+                    <div class="flex flex-col items-center gap-2 text-brand-text/40">
+                        <i class="ri-loader-4-line animate-spin text-2xl text-brand-blue"></i>
+                        <p class="text-sm">Loading users…</p>
+                    </div>
                 </div>
             </div>
 
-        </div>
-    </div>
+        </div><!-- /Users Section -->
+    </div><!-- /root -->
 
     <script type="module" src="js/admin.js"></script>
     <script>
@@ -164,10 +322,9 @@
             const loader = document.getElementById('page-loader');
             if (loader) {
                 loader.style.opacity = '0';
-                setTimeout(() => { loader.style.display = 'none'; }, 500);
+                setTimeout(() => loader.style.display = 'none', 460);
             }
         });
     </script>
 </body>
-
 </html>

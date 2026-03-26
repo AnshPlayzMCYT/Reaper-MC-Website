@@ -8,9 +8,13 @@ const statTotalUsers = document.getElementById('stat-total-users');
 const refreshBtn = document.getElementById('refresh-users-btn');
 const notificationBanner = document.getElementById('admin-notification');
 const modalsContainer = document.getElementById('modals');
+const searchInput = document.getElementById('user-search-input');
+const searchClearBtn = document.getElementById('user-search-clear');
+const searchResultsCount = document.getElementById('search-results-count');
 
 // State
 let usersList = [];
+let searchQuery = '';
 let authToken = sessionStorage.getItem('admin_token');
 
 // Enforce Auth
@@ -131,15 +135,19 @@ const formatDate = (dateString) => {
 const loadUsers = async () => {
     const loadingHtmlTable = `
         <tr>
-            <td colspan="7" class="p-8 text-center text-brand-text">
-                <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
-                <p>Loading users...</p>
+            <td colspan="7" class="px-5 py-12 text-center">
+                <div class="flex flex-col items-center gap-3 text-brand-text/50">
+                    <i class="ri-loader-4-line animate-spin text-3xl text-brand-blue"></i>
+                    <p class="text-sm">Loading users…</p>
+                </div>
             </td>
         </tr>`;
     const loadingHtmlCard = `
-        <div class="p-8 text-center text-brand-text">
-            <i class="ri-loader-4-line animate-spin text-3xl inline-block mb-2"></i>
-            <p>Loading users...</p>
+        <div class="px-4 py-12 text-center">
+            <div class="flex flex-col items-center gap-3 text-brand-text/50">
+                <i class="ri-loader-4-line animate-spin text-3xl text-brand-blue"></i>
+                <p class="text-sm">Loading users…</p>
+            </div>
         </div>`;
     usersTableBody.innerHTML = loadingHtmlTable;
     usersCardsContainer.innerHTML = loadingHtmlCard;
@@ -190,22 +198,49 @@ const getRankClass = (rank) => {
     if (rank === 'MVP+')    return 'bg-blue-500/20 text-blue-500 border border-blue-500/30';
     if (rank === 'Legend')  return 'bg-orange-500/20 text-orange-400 border border-orange-500/30';
     if (rank === 'Immortal')return 'bg-cyan-500/20 text-cyan-400 border border-cyan-400/30';
+    if (rank === 'Owner')   return 'bg-red-600/20 text-red-500 border border-red-600/30';
+    if (rank === 'Admin')   return 'bg-red-500/20 text-red-400 border border-red-500/30';
+    if (rank === 'Mod')     return 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30';
+    if (rank === 'Famous')  return 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30';
+    if (rank === 'Media')   return 'bg-purple-500/20 text-purple-400 border border-purple-500/30';
     return 'bg-brand-border text-brand-text';
 };
 
 // Render Table (desktop) + Cards (mobile)
 const renderTable = () => {
-    if (usersList.length === 0) {
-        const emptyHtml = `
-            <i class="ri-user-line text-3xl inline-block mb-2"></i>
-            <p>No users found.</p>`;
+    // Filter users by search query
+    const q = searchQuery.toLowerCase().trim();
+    const filtered = q ? usersList.filter(user => {
+        const name = (user.displayName || '').toLowerCase();
+        const email = (user.email || '').toLowerCase();
+        const rank = ((user.customClaims && user.customClaims.rank) ? user.customClaims.rank : 'Member').toLowerCase();
+        const status = user.disabled ? 'disabled' : 'active';
+        const joined = formatDate(user.metadata?.creationTime).toLowerCase();
+        const lastLogin = formatDate(user.metadata?.lastSignInTime).toLowerCase();
+        return name.includes(q) || email.includes(q) || rank.includes(q) || status.includes(q) || joined.includes(q) || lastLogin.includes(q);
+    }) : usersList;
+
+    // Update result count badge
+    if (searchResultsCount) {
+        if (q) {
+            searchResultsCount.textContent = `— ${filtered.length} of ${usersList.length} results`;
+            searchResultsCount.classList.remove('hidden');
+        } else {
+            searchResultsCount.classList.add('hidden');
+        }
+    }
+
+    if (filtered.length === 0) {
+        const emptyHtml = q
+            ? `<i class="ri-search-line text-3xl inline-block mb-2"></i><p>No users match "<strong class="text-white">${q}</strong>"</p>`
+            : `<i class="ri-user-line text-3xl inline-block mb-2"></i><p>No users found.</p>`;
         usersTableBody.innerHTML = `<tr><td colspan="7" class="p-8 text-center text-brand-text">${emptyHtml}</td></tr>`;
         usersCardsContainer.innerHTML = `<div class="p-8 text-center text-brand-text">${emptyHtml}</div>`;
         return;
     }
 
     // ── Desktop rows ──
-    usersTableBody.innerHTML = usersList.map(user => {
+    usersTableBody.innerHTML = filtered.map(user => {
         const displayName = user.displayName || 'Unknown';
         const imgName = user.displayName || 'MHF_Steve';
         const rank = (user.customClaims && user.customClaims.rank) ? user.customClaims.rank : 'Member';
@@ -214,34 +249,49 @@ const renderTable = () => {
             ? '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-semibold border border-red-500/30">Disabled</span>'
             : '<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-semibold border border-green-500/30">Active</span>';
 
+        const providerData = user.providerData && user.providerData.length > 0 ? user.providerData[0] : null;
+        let providerIcon = '<i class="ri-mail-line text-brand-text" title="Email/Password"></i>';
+        if (providerData) {
+            if (providerData.providerId === 'google.com') {
+                providerIcon = '<i class="ri-google-fill text-red-500 text-sm" title="Google"></i>';
+            } else if (providerData.providerId.includes('discord')) {
+                providerIcon = '<i class="ri-discord-fill text-[#5865F2] text-sm" title="Discord"></i>';
+            }
+        }
+
         return `
-        <tr class="hover:bg-brand-light/30 transition-colors group">
-            <td class="p-4">
+        <tr class="user-row row-animate border-b border-brand-border/40 last:border-none">
+            <td class="px-5 py-3.5">
                 <div class="flex items-center gap-3">
-                    <img src="https://mc-heads.net/avatar/${imgName}/40" class="w-10 h-10 rounded shadow-sm border border-brand-border" style="image-rendering: pixelated;" onerror="this.src='${defaultSkinUrl}'">
+                    <img src="https://mc-heads.net/avatar/${imgName}/40" class="w-10 h-10 rounded-xl shadow-sm border border-brand-border/60" style="image-rendering: pixelated;" onerror="this.src='${defaultSkinUrl}'">
                     <div>
-                        <p class="font-bold text-white">${displayName}</p>
-                        <p class="text-[10px] text-brand-text font-mono">${user.uid.substring(0, 10)}...</p>
+                        <p class="font-bold text-white text-sm">${displayName}</p>
+                        <p class="text-[10px] text-brand-text/50 font-mono">${user.uid.substring(0, 10)}…</p>
                     </div>
                 </div>
             </td>
-            <td class="p-4 text-sm text-brand-text">${user.email}</td>
-            <td class="p-4 text-sm font-bold">
-                <span class="px-2 py-1 rounded text-xs ${rankClass}">${rank}</span>
+            <td class="px-5 py-3.5 text-sm text-brand-text/80">
+                <div class="flex items-center gap-2">
+                    ${providerIcon}
+                    <span>${user.email || 'No Email'}</span>
+                </div>
             </td>
-            <td class="p-4 text-sm">${statusHtml}</td>
-            <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.creationTime)}</td>
-            <td class="p-4 text-sm text-brand-text">${formatDate(user.metadata?.lastSignInTime)}</td>
-            <td class="p-4">
-                <div class="flex items-center justify-end gap-3">
-                    <button onclick="toggleDisableStatus('${user.uid}', ${!!user.disabled})" class="relative inline-flex shrink-0 items-center h-6 rounded-full w-11 transition-colors focus:outline-none ${user.disabled ? 'bg-red-500' : 'bg-green-500'}" title="${user.disabled ? 'Enable User' : 'Disable User'}">
-                        <span class="inline-block w-4 h-4 transform bg-white rounded-full transition-transform ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
+            <td class="px-5 py-3.5 text-sm font-bold">
+                <span class="px-2.5 py-1 rounded-lg text-xs ${rankClass}">${rank}</span>
+            </td>
+            <td class="px-5 py-3.5 text-sm">${statusHtml}</td>
+            <td class="px-5 py-3.5 text-sm text-brand-text/70">${formatDate(user.metadata?.creationTime)}</td>
+            <td class="px-5 py-3.5 text-sm text-brand-text/70">${formatDate(user.metadata?.lastSignInTime)}</td>
+            <td class="px-5 py-3.5">
+                <div class="flex items-center justify-end gap-2.5">
+                    <button onclick="toggleDisableStatus('${user.uid}', ${!!user.disabled})" class="relative inline-flex shrink-0 items-center h-6 rounded-full w-11 transition-all focus:outline-none ${user.disabled ? 'bg-red-500/80 hover:bg-red-500' : 'bg-green-500/80 hover:bg-green-500'}" title="${user.disabled ? 'Enable User' : 'Disable User'}">
+                        <span class="inline-block w-4 h-4 transform bg-white rounded-full shadow transition-transform ${user.disabled ? 'translate-x-1' : 'translate-x-6'}"></span>
                     </button>
-                    <div class="flex gap-2 shrink-0">
-                        <button onclick="openEditModal('${user.uid}', '${displayName}', '${rank}')" class="text-brand-blue hover:text-white p-2 rounded hover:bg-brand-blue/20 transition-colors" title="Edit Properties">
+                    <div class="flex gap-1 shrink-0">
+                        <button onclick="openEditModal('${user.uid}', '${displayName}', '${rank}')" class="text-brand-blue hover:text-white p-2 rounded-lg hover:bg-brand-blue/20 transition-all active:scale-90" title="Edit">
                             <i class="ri-edit-line"></i>
                         </button>
-                        <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500 hover:text-red-400 p-2 rounded hover:bg-red-500/20 transition-colors" title="Delete User">
+                        <button onclick="confirmDelete('${user.uid}', '${user.email}')" class="text-red-500/70 hover:text-red-400 p-2 rounded-lg hover:bg-red-500/20 transition-all active:scale-90" title="Delete">
                             <i class="ri-delete-bin-line"></i>
                         </button>
                     </div>
@@ -251,7 +301,7 @@ const renderTable = () => {
     }).join('');
 
     // ── Mobile cards ──
-    usersCardsContainer.innerHTML = usersList.map(user => {
+    usersCardsContainer.innerHTML = filtered.map(user => {
         const displayName = user.displayName || 'Unknown';
         const imgName = user.displayName || 'MHF_Steve';
         const rank = (user.customClaims && user.customClaims.rank) ? user.customClaims.rank : 'Member';
@@ -259,6 +309,16 @@ const renderTable = () => {
         const statusHtml = user.disabled
             ? '<span class="bg-red-500/20 text-red-400 px-2 py-1 rounded text-xs font-semibold border border-red-500/30">Disabled</span>'
             : '<span class="bg-green-500/20 text-green-400 px-2 py-1 rounded text-xs font-semibold border border-green-500/30">Active</span>';
+
+        const providerData = user.providerData && user.providerData.length > 0 ? user.providerData[0] : null;
+        let providerIcon = '<i class="ri-mail-line text-brand-text" title="Email/Password"></i>';
+        if (providerData) {
+            if (providerData.providerId === 'google.com') {
+                providerIcon = '<i class="ri-google-fill text-red-500 text-sm" title="Google"></i>';
+            } else if (providerData.providerId.includes('discord')) {
+                providerIcon = '<i class="ri-discord-fill text-[#5865F2] text-sm" title="Discord"></i>';
+            }
+        }
 
         return `
         <div class="user-card p-4 bg-brand-dark border-b border-brand-border last:border-b-0">
@@ -268,7 +328,10 @@ const renderTable = () => {
                     <img src="https://mc-heads.net/avatar/${imgName}/48" class="w-12 h-12 rounded-lg border border-brand-border shrink-0" style="image-rendering: pixelated;" onerror="this.src='${defaultSkinUrl}'">
                     <div class="min-w-0">
                         <p class="font-bold text-white text-base truncate">${displayName}</p>
-                        <p class="text-[10px] text-brand-text font-mono truncate">${user.email}</p>
+                        <div class="flex items-center gap-1.5 mt-0.5">
+                            ${providerIcon}
+                            <p class="text-[10px] text-brand-text font-mono truncate">${user.email || 'No Email'}</p>
+                        </div>
                     </div>
                 </div>
                 <!-- Action buttons (always visible on mobile) -->
@@ -302,6 +365,28 @@ const renderTable = () => {
         </div>`;
     }).join('');
 };
+
+// ── Search wiring ──
+let searchDebounce = null;
+if (searchInput) {
+    searchInput.addEventListener('input', () => {
+        searchQuery = searchInput.value;
+        if (searchClearBtn) {
+            searchQuery ? searchClearBtn.classList.remove('hidden') : searchClearBtn.classList.add('hidden');
+        }
+        clearTimeout(searchDebounce);
+        searchDebounce = setTimeout(() => renderTable(), 200);
+    });
+}
+if (searchClearBtn) {
+    searchClearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        searchQuery = '';
+        searchClearBtn.classList.add('hidden');
+        renderTable();
+        searchInput.focus();
+    });
+}
 
 // --- Actions ---
 
@@ -376,7 +461,7 @@ const deleteUser = async (uid) => {
 // --- Modals ---
 
 window.openEditModal = (uid, currentUsername, currentRank) => {
-    const ranks = ['Member', 'VIP', 'VIP+', 'MVP', 'MVP+', 'Legend', 'Immortal'];
+    const ranks = ['Member', 'VIP', 'VIP+', 'MVP', 'MVP+', 'Legend', 'Immortal', 'Owner', 'Admin', 'Mod', 'Famous', 'Media'];
     const rankOptions = ranks.map(r => `<option value="${r}" ${r === currentRank ? 'selected' : ''}>${r}</option>`).join('');
 
     const modalHtml = `
@@ -610,3 +695,148 @@ if (logoutBtn) {
 if (authToken) {
     loadUsers();
 }
+
+// --- Live Server Players ---
+const fetchLivePlayers = async () => {
+    try {
+        const res = await fetch('https://api.mcstatus.io/v2/status/java/play.reapermc.in');
+        const data = await res.json();
+        
+        const count = data.players?.online || 0;
+        const max = data.players?.max || 0;
+        const list = data.players?.list || [];
+        
+        const statOnlinePlayers = document.getElementById('stat-online-players');
+        if (statOnlinePlayers) statOnlinePlayers.textContent = data.online ? count : 'Offline';
+        
+        return { online: !!data.online, count, max, list };
+    } catch (err) {
+        console.error('Failed to fetch live players:', err);
+        const statOnlinePlayers = document.getElementById('stat-online-players');
+        if (statOnlinePlayers) statOnlinePlayers.textContent = 'Error';
+        return { online: false, count: 0, max: 0, list: [] };
+    }
+};
+
+window.showLivePlayersModal = async () => {
+    const btn = document.getElementById('view-live-players-btn');
+    if (!btn) return;
+    const ogHtml = btn.innerHTML;
+    btn.innerHTML = '<i class="ri-loader-4-line text-xl sm:text-2xl animate-spin"></i>';
+    btn.disabled = true;
+    
+    const { online, count, max, list } = await fetchLivePlayers();
+    
+    btn.innerHTML = ogHtml;
+    btn.disabled = false;
+    
+    let contentHtml = '';
+    if (!online) {
+        contentHtml = `
+            <div class="flex flex-col items-center justify-center py-8 text-red-400">
+                <i class="ri-wifi-off-line text-5xl mb-3 opacity-50"></i>
+                <p class="text-lg font-bold">Server is Offline</p>
+                <p class="text-sm">Cannot fetch player list.</p>
+            </div>
+        `;
+    } else if (count === 0) {
+        contentHtml = `
+            <div class="flex flex-col items-center justify-center py-8 text-brand-text">
+                <i class="ri-ghost-line text-5xl mb-3 opacity-50"></i>
+                <p class="text-lg font-bold">Server is empty</p>
+                <p class="text-sm">No players are currently online.</p>
+            </div>
+        `;
+    } else if (list.length === 0 && count > 0) {
+        // BungeeCord proxies don't expose player names — show a nicer message with avatar placeholders
+        const avatarPlaceholders = Array.from({ length: Math.min(count, 8) }, (_, i) => `
+            <div class="flex items-center gap-3 bg-brand-darkest border border-brand-border p-3 rounded-xl">
+                <div class="w-10 h-10 rounded bg-brand-border flex items-center justify-center shrink-0">
+                    <i class="ri-user-line text-brand-text"></i>
+                </div>
+                <div>
+                    <p class="font-bold text-white">Player ${i + 1}</p>
+                    <p class="text-[10px] text-brand-text/50">Name hidden by server</p>
+                </div>
+            </div>
+        `).join('');
+        
+        const extraNote = count > 8 ? `<p class="text-xs text-brand-text/50 text-center mt-2">...and ${count - 8} more</p>` : '';
+        
+        contentHtml = `
+            <div>
+                <div class="flex items-center gap-2 mb-3 p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
+                    <i class="ri-information-line text-yellow-400 text-lg shrink-0"></i>
+                    <p class="text-xs text-yellow-400">BungeeCord servers don't expose player names publicly. Showing <span class="font-bold">${count}</span> active slots.</p>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[50vh] overflow-y-auto">
+                    ${avatarPlaceholders}
+                </div>
+                ${extraNote}
+            </div>
+        `;
+    } else {
+        const playersHtml = list.map(p => `
+            <div class="flex items-center gap-3 bg-brand-darkest border border-brand-border p-3 rounded-xl hover:border-brand-blue/50 transition-colors">
+                <img src="https://mc-heads.net/avatar/${p.name}/40" class="w-10 h-10 rounded shadow-sm border border-brand-border" style="image-rendering: pixelated;" onerror="this.src='https://mc-heads.net/avatar/MHF_Steve/40'">
+                <div>
+                    <p class="font-bold text-white">${p.name}</p>
+                    <p class="text-[10px] text-brand-text font-mono">${p.uuid.substring(0, 13)}...</p>
+                </div>
+            </div>
+        `).join('');
+        
+        contentHtml = `
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                ${playersHtml}
+            </div>
+        `;
+    }
+
+    const modalId = 'live-players-modal-' + Date.now();
+    const modalHtml = `
+        <div id="${modalId}" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-end sm:items-center justify-center z-[150] p-0 sm:p-4 opacity-0 transition-opacity duration-200">
+            <div id="${modalId}-box" class="bg-brand-light border border-brand-border sm:rounded-xl shadow-2xl w-full sm:max-w-xl overflow-hidden flex flex-col max-h-[92vh] sm:max-h-[90vh] rounded-t-2xl transform scale-95 transition-transform duration-200">
+                
+                <div class="p-4 sm:p-5 border-b border-brand-border flex justify-between items-center bg-brand-dark shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-green-500/10 border border-green-500/30 p-2 rounded-lg text-green-500">
+                            <i class="ri-vidicon-line text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base sm:text-lg font-bold text-white leading-tight">Live Players</h3>
+                            <p class="text-xs text-brand-text">Currently tracking <span class="text-green-400 font-bold">${count}</span> / ${max} players</p>
+                        </div>
+                    </div>
+                    <button onclick="closeCustomModal('${modalId}')" class="text-brand-text hover:text-white hover:bg-brand-border transition-all p-2 rounded-lg shrink-0">
+                        <i class="ri-close-line text-xl"></i>
+                    </button>
+                </div>
+
+                <div class="p-4 sm:p-5 w-full bg-brand-light">
+                    ${contentHtml}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.getElementById('modals').insertAdjacentHTML('beforeend', modalHtml);
+    
+    setTimeout(() => {
+        const m = document.getElementById(modalId);
+        const b = document.getElementById(`${modalId}-box`);
+        if (m) m.classList.remove('opacity-0');
+        if (b) b.classList.remove('scale-95');
+    }, 10);
+};
+
+// Bind to button
+const livePlayersBtn = document.getElementById('view-live-players-btn');
+if (livePlayersBtn) {
+    livePlayersBtn.addEventListener('click', showLivePlayersModal);
+}
+
+// Initial fetch
+fetchLivePlayers();
+// Refresh every 60 seconds
+setInterval(fetchLivePlayers, 60000);
